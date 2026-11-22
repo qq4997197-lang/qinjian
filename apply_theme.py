@@ -57,8 +57,8 @@ def version_of(text):
 def strip_marked(text):
     """撤掉所有带标记的插入块，并把换过的配色值还原。"""
     text = re.sub(r'[ \t]*<!-- %s:start -->.*?<!-- %s:end -->\r?\n?' % (MARK, MARK), "", text, flags=re.S)
-    text = re.sub(r"'(#[0-9a-fA-F]{6})',?( *)/\* %s:was (#[0-9a-fA-F]{6}) \*/" % MARK,
-                  lambda m: "'%s'," % m.group(3), text)
+    text = re.sub(r"'#[0-9a-fA-F]{6}'(,?) /\* %s:was (#[0-9a-fA-F]{6}) \*/" % MARK,
+                  lambda m: "'%s'%s" % (m.group(2), m.group(1)), text)
     return text
 
 
@@ -97,9 +97,10 @@ def recolor_screen(text):
         new = SCREEN_COLORS.get(key)
         if not new or new.lower() == old.lower():
             return mm.group(0)
-        return "%s: '%s', /* %s:was %s */" % (key, new, MARK, old)
+        # 末尾那一项可能不带逗号：逗号原样带回去，--revert 才能逐字节还原
+        return "%s: '%s'%s /* %s:was %s */" % (key, new, mm.group(3), MARK, old)
 
-    new_body = re.sub(r"(\w+):\s*'(#[0-9a-fA-F]{6})',", swap, body)
+    new_body = re.sub(r"(\w+):\s*'(#[0-9a-fA-F]{6})'(,?)", swap, body)
     return text[:m.start(1)] + new_body + text[m.end(1):]
 
 
