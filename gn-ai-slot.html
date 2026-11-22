@@ -1,0 +1,25 @@
+<!-- gn-ai-slot:start —— AI 模块预留区：只有容器和占位文案，不含任何逻辑。
+     接入时把结果写进三个 [data-ai-slot]，并给该格加 data-ai-ready 属性即可。 -->
+<details class="gn-ai" id="gn-ai">
+  <summary class="gn-ai-hd">
+    <span class="gn-ai-badge">AI</span>
+    <span class="gn-ai-title">智能辅助</span>
+    <span class="gn-ai-sub">意向预测 · 跟进建议 · 客户分析</span>
+    <span class="gn-ai-state">预留 · 未接入</span>
+  </summary>
+  <div class="gn-ai-bd">
+    <div class="gn-ai-cell" data-ai-slot="intent">
+      <h4>意向预测</h4>
+      <p class="gn-ai-ph">接入后在这里显示客户入职意向评估。</p>
+    </div>
+    <div class="gn-ai-cell" data-ai-slot="advice">
+      <h4>跟进建议</h4>
+      <p class="gn-ai-ph">接入后在这里显示下一步跟进建议。</p>
+    </div>
+    <div class="gn-ai-cell" data-ai-slot="insight">
+      <h4>客户分析</h4>
+      <p class="gn-ai-ph">接入后在这里显示客户画像与风险提示。</p>
+    </div>
+  </div>
+</details>
+<!-- gn-ai-slot:end -->

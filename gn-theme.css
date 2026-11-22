@@ -1,0 +1,1343 @@
+/* =====================================================================
+   gn-theme.css —— 广纳人力一体化系统 · 统一视觉规范（纯样式覆盖层）
+   ---------------------------------------------------------------------
+   · 只改长相：不动 app.js / api.php / 任何接口、字段、流程。
+   · 加载顺序：必须排在 style.css 和 index.html 内联 <style> 之后。
+   · 回滚：删掉 <link href="gn-theme.css"> 这一行即可，style.css 一个字节没改。
+   · 每一节分两段：前半是颜色 / 圆角 / 边框（所有屏宽都生效），
+     后半 @media (min-width: 821px) 是尺寸 / 间距 / 字号（只在电脑端生效）。
+     手机端的版式是之前逐屏量过的，这里一个尺寸都不碰，只换皮。
+   · 以后新加组件请直接用第 1 节的 --gn-* 变量，别再写死色值和圆角。
+   · 文件结构：
+       1 设计变量（1b 字号/圆角归一）  2 基础排版  3 外壳（侧栏 / 顶栏 / 内容区）
+       4 卡片          5 按钮         6 页签 / 分页
+       7 表单          8 表格         9 状态标签（四色）
+      10 提示 / 横幅  11 跟进表行色  12 弹层 / 抽屉
+      13 AI 预留区    14 登录页      15 响应式     16 打印
+   ===================================================================== */
+
+/* ---------- 1 设计变量 ---------- */
+:root {
+  /* 品牌红：只给导航高亮、主按钮、关键标签、提醒文字用 */
+  --gn-red: #e00012;
+  --gn-red-hover: #c40010;
+  --gn-red-soft: #fff1f2;
+  --gn-red-softer: #fff8f8;
+  --gn-red-line: #f7c6ca;
+
+  /* 中性色 */
+  --gn-bg: #ffffff;
+  --gn-surface: #f7f8fa;
+  --gn-text: #1f2329;
+  --gn-text-2: #4e5969;
+  --gn-text-3: #86909c;
+  --gn-line: #e5e6eb;
+  --gn-line-soft: #f0f1f3;
+  --gn-line-strong: #c9cdd4;
+
+  /* 状态四色：紧急 = 品牌红 / 正常跟进 = 浅蓝 / 已成交 = 浅绿 / 无效放弃 = 浅灰 */
+  --gn-st-urgent-bg: var(--gn-red);
+  --gn-st-urgent-fg: #ffffff;
+  --gn-st-normal-bg: #e8f3ff;
+  --gn-st-normal-fg: #1d5fb8;
+  --gn-st-normal-line: #c4dffb;
+  --gn-st-done-bg: #e8f7ee;
+  --gn-st-done-fg: #1a7f45;
+  --gn-st-done-line: #bfe6cd;
+  --gn-st-off-bg: #f2f3f5;
+  --gn-st-off-fg: #6b7785;
+  --gn-st-off-line: #e1e3e8;
+
+  /* 圆角：卡片 8 / 控件 6 / 标签 4 */
+  --gn-r-card: 8px;
+  --gn-r-ctl: 6px;
+  --gn-r-tag: 4px;
+
+  /* 间距：4 的倍数 */
+  --gn-s1: 4px;
+  --gn-s2: 8px;
+  --gn-s3: 12px;
+  --gn-s4: 16px;
+  --gn-s5: 20px;
+  --gn-s6: 24px;
+
+  /* 字号层级：页标题 20 / 卡片标题 16 / 正文 14 / 辅助 13 / 注释 12 */
+  --gn-fs-page: 20px;
+  --gn-fs-card: 16px;
+  --gn-fs-body: 14px;
+  --gn-fs-sub: 13px;
+  --gn-fs-cap: 12px;
+
+  /* 把 style.css 原有变量接到新规范上 —— 凡是用变量写的旧样式自动跟着变 */
+  --primary: var(--gn-red);
+  --primary-d: var(--gn-red-hover);
+  --primary-soft: var(--gn-red-soft);
+  --primary-line: var(--gn-red-line);
+  --brand: var(--gn-red);
+  --brand2: var(--gn-red);
+  --brand-grad: var(--gn-red);
+  --bg: var(--gn-bg);
+  --card: var(--gn-bg);
+  --text: var(--gn-text);
+  --muted: var(--gn-text-3);
+  --line: var(--gn-line);
+  --red: var(--gn-red);
+  --green: var(--gn-st-done-fg);
+  --amber: var(--gn-text-2);
+  --shadow: none;
+  --radius-card: var(--gn-r-card);
+}
+
+/* ---------- 1b 字号 / 圆角归一 ---------- */
+/* style.css 里攒下来的零碎值（11.5 / 12.5 / 13.5px 字号，5 / 7 / 9 / 10 / 12 / 14px 圆角）按下面的档位收拢：
+     字号  ≤11.5 → 12   12.5 → 13   13.5 / 14.5 → 14   16.5–19 → 16   21–23 → 20   26+ → 28
+     圆角  2–5 → 4（标签）   7 / 9 → 6（控件）   10–20 → 8（容器；控件类仍是 6）
+   · 字号只在电脑端（≥821px）收拢：手机端那批字号是逐屏量过的，不动。
+   · 表格数据行的 15px 是之前定过的口径，保留。
+   · 选择器照抄 style.css 原样，所以权重不变，只是换了一个值。 */
+@media (min-width: 821px) {
+  .wxd-left, .wxd-me-k, .wxd-hint-s, .job-shelf-bar .jregion .nbadge, .jd-vbox .jd-vph small,
+  .jd-vbox .jd-vsound, .jd-m .jd-mb button, .jd-m .jd-mb a, .jd-m .jd-mt, .job-table .j-manual, .jtag,
+  .jtag b, .jd-m .jd-mnote.empty, .pay-table td .pay-rolehint, .exp-tl-label, .exp-tl-sub, .exp-tl-cmt,
+  .exp-d-item-s, .exp-thumb-doc, .rg-none, .db-small, .team-ov, .bl-tag, .jpst, .jfixon, .as-who i,
+  .as-noreal, .as-sgrp .as-go, .as-per-sub, .as-per-ops .btn, .as-per-st, .as-snt, .ld-intent, .as-mini,
+  .as-link, .as-lreq-badge, .as-link-item .as-link-st, .arr-table td[data-l="业务员状态"] .hint, .ld-clock,
+  .ld-logn, .ld-self, .ld-fgrid .ld-f label, .ldc-grade, .ldc-late-tag, .ldc-tags > span, .ldc-step span,
+  .ld-sec-tag, .ld-sec-tip, .ld-colbar-t, .ld-msg-h .ld-role, .ld-msg-h .ld-act, .ld-msg-h .ld-time,
+  .ld-proxy, .ld-sys span, .ld-bub-who, .ld-bub-t, .ps-unbound, .ps-sig-tip, .saf-mv, .saf-dup,
+  .gs-head .gs-ro, .wxd-mx .mx-c i, .gs-tip, .as-sg-h .hint, .as-si-tag, .as-have-i .as-have-k,
+  .as-have-i .as-obj, .as-obj-item .as-obj-meta, .as-ar-tag, .as-ar-flag, .as-ad-item .as-ad-k,
+  .wxm-meta, .wxm-team-n, .wxm-acc, .db-chip, .db-tag, .db-st, .sidebar .nav-group-hd { font-size: 12px; }
+  .region-bar .rg-tip, .rg-fix, .rg-fix select, .rg-sel, .tip, .mine-page-info, .pager .pg-info,
+  .dash-table tr.wxd-subhead th, #view-daily .dash-table tr.wxd-subhead th, .stat-card .l, .cd-item,
+  .cd-last, .jd-fix, .jd-empty, .jd-warn, .je-notetip, .job-detail > div, .hist-item, .pc-due,
+  #pay-my-rolehint .pay-rolehint, .pex-chip, .pex-num, .pay-admin-fold > summary .muted,
+  textarea#ar-text, textarea#cb-text, textarea#jb-text, textarea#paf-text, textarea#bulk-text, .fn-rate,
+  .rc-sub, .rc-why, .team-block-meta, .team-panel-label, .team-panel-row select,
+  .team-panel-row input[type="text"], .team-perm-item, .follow-ctl, .follow-ctl select, .fw-btn,
+  .as-none, .as-scol .h, .as-sgrp, .as-per-grp .h, .as-per-it, .as-per-warn, .as-sit, .as-warn, .as-hit,
+  .as-ss-none, .as-lreq-item .as-lreq-n, .ld-g, .chk, .ldc-info, .ldc-cnt, .ld-off-chip, .ld-msg-h,
+  .ld-review .ld-rv-tip, .ld-offreq-bar, .ld-warn-bar, .ld-black-bar, #ld-itvmiss .ld-im-s,
+  #ld-batch-card textarea, .ps-hint, .ps-row-sub, .ps-adm-sub, .ps-bar-txt, .ps-net-l, .ps-sec-t,
+  .ps-line-adj, .ps-note, .ps-or, .ps-errs, .ps-empty span, .ps-selinfo, .ps-dups, .lhi-askbar .tx span,
+  .saf-card-t, .saf-day, .saf-del, .saf-move, .saf-fil-i, .saf-fil-i select, .saf-fil-q,
+  .as-self-st .as-sst-txt, .as-sg-empty, .as-si .as-si-own, .as-si .as-si-on, .as-have-i, .as-obj-item,
+  .as-ad-item .as-ad-why input, .wxm-sub, .exp-paybox-msg, .tip-fold > summary, .gn-remind-txt span,
+  .ld-now-btn, .db-kpi .s, .db-todo-item .d, .db-itv-item .sub, .db-empty .hint, .dbh-pay-go,
+  .pay-formula-bar-txt span, .pf-table, .pf-table .lst-grp td, .dbh-settle-go { font-size: 13px; }
+  .user-table th, .cust-table thead th, .dash-table th, #view-dashboard .dash-table th,
+  #view-daily .dash-table th, .asset-table th, .as-lreq-item .as-lreq-h, .ld-drawer-body h4, .ld-sec-h b,
+  .ld-review .ld-rv-note, .ps-empty, .ps-adm-name, .ps-line, .lhi-done, .as-sg-h b, .wxm-linkbar,
+  .exp-paybox-t, .gn-remind-btn, .db-home-sub, .db-itv-item, .db-empty { font-size: 14px; }
+  .claim-status b, .modal-card h3, .exp-card-amt, .rc-num i, .ld-drawer-head #ld-d-title,
+  .ld-drawer-head #ld-d-title .ld-d-tel, .ldc-nm, .ps-arrow, .ps-row-sub b, .dbh-settle-card .n { font-size: 16px; }
+  .brand, .exp-stat-n, .rc-num.rc-none i, .ps-stat-n, #view-payslip h2, .saf-card-t b, .db-kpi .n.soon { font-size: 20px; }
+  .stat .num, .stat-card .n, .jd-vbox .jd-vph, .rc-num, .ps-net-v, .dash-todo-kpis .stat-card .n,
+  .db-home-hd h2, .db-kpi .n { font-size: 28px; }
+}
+
+.rg-tag, .jd-m .jd-mt, mark, .jtag, .je-notetip, #pay-my-rolehint .pay-rolehint, .exp-thumb,
+.lg-item i, .ld-g, .ps-sig code, .saf-bad { border-radius: 4px; }
+.sidebar .brand-mark, .pc-behalf, .tab, .auth-form input, .auth-form select, .btn, .rg-fix select,
+.rg-sel, .modal-card input, #ld-rej-card .modal-card select, .crm-tabs, .crm-tabs .nav-btn,
+.owner-head .ogrp-toggle, .job-shelf-bar .jregion .nbadge, #view-jobs .stat-grid .stat-card,
+#view-jobs .filter-bar .field select, #view-jobs .filter-bar .field input,
+#view-lead .stat-grid .stat-card, .job-table tr.cust-main, #view-lead .filter-bar .field select,
+#view-lead .filter-bar .field input, #view-lead .filter-bar .chk, .pay-ledger-table tr, .fn-barwrap,
+.fn-bar, .team-panel-row select, .team-panel-row input[type="text"], #team-import-text,
+.follow-ctl select, .fw-btn, .as-tabs, .as-tabs .as-tab, .ld-drawer-head #ld-d-title .ld-d-tel,
+.ldc-info.ldc-spec, .ld-sys span, .ps-chk, .dt-row, .ld-table tr, .as-si .as-si-own, .as-si .as-si-on,
+.as-si .as-si-thumb, .as-cf, .as-ad-item, .exp-bank, .edit-bank, .exp-payfile img,
+.stat-grid .stat-card, .ps-stat, #view-jobs .job-table tr.cust-main, .sidebar .nav-btn .badge { border-radius: 6px; }
+.auth-card, .region-bar, .num-list li, .download-tip, .record, .modal-card, .stat, .filter-bar,
+.stat-card, .cust-wrap, .jd-m, .card, .pay-card, #pay-export-modal .pex-mode, #pex-list, .exp-stat,
+.exp-card, .exp-item, .stat-grid .stat-card, .ratio-card, .chart-box, .team-block, .jnav, .jd-block,
+.as-person, .as-chain, .as-lreq-item, .ld-fgrid .ld-f, .ldc, .ld-opbox, .ld-msg, .ld-say, .ld-review,
+.ld-fw-tpl, #ld-itvmiss .ld-im-card, .ps-stat, .ps-row, .ps-adm-row, .ps-state, .ps-net, .ps-xlsx,
+#ps-xlsx-preview, .ps-block, .ps-empty, .lhi-askbar, .lhi-done, .saf-card, .saf-day, .gs-drop,
+.wxd-rg-card, .ld-sched-wrap, .as-forbar, .as-self-st, .as-sg, .wxm-linkbar, .wxm-team, .exp-paybox,
+.pipeline .step, .empty, .gn-remind-bar, .db-mode-tog, .db-bell, .db-kpi, .db-home-card, .db-todo-item,
+.db-itv-item, .db-empty, .dbh-pay-sum, .dbh-pay-card, .pay-formula-bar, .pay-formula-item,
+.dbh-settle-sum, .dbh-settle-card { border-radius: 8px; }
+.ps-bar, .ps-bar i, .as-self-st .as-sst-pill, .as-ar-tag, .as-ar-flag { border-radius: 999px; }
+
+/* ---------- 2 基础排版 ---------- */
+html, body { background: var(--gn-bg) !important; }
+body { color: var(--gn-text); -webkit-font-smoothing: antialiased; }
+
+.content h2, .section > h2, #db-home-title { font-weight: 600; color: var(--gn-text); }
+.card h3, .card > h3, .modal-card h3 { font-weight: 600; color: var(--gn-text); }
+.card h4 { font-weight: 600; color: var(--gn-text); }
+.hint, .pool-count, .db-home-sub, .modal-sub { color: var(--gn-text-3); }
+.muted { color: var(--gn-text-3); }
+.main a { color: var(--gn-text-2); }
+.main a:hover { color: var(--gn-red); }
+mark { background: var(--gn-red-soft) !important; color: var(--gn-red-hover); }
+
+/* 卡片标题前那道彩色竖条撤掉：标题靠字重和字号分层，不靠颜色 */
+#view-dashboard .card > h3::before,
+#view-daily .card > h3::before,
+.ps-blockhead h3::before {
+  display: none !important;
+}
+
+/* 尺寸、间距、字号只在电脑端（≥821px）生效；手机端沿用原来逐屏量过的版式，这里只换颜色和形状 */
+@media (min-width: 821px) {
+  body { font-size: var(--gn-fs-body); line-height: 1.57; }
+  .main button, .main input, .main select, .main textarea,
+  .modal button, .modal input, .modal select, .modal textarea {
+    font-family: inherit;
+  }
+  .content h2, .section > h2, #db-home-title {
+    font-size: var(--gn-fs-page) !important;
+    line-height: 28px;
+    letter-spacing: 0;
+    margin: 0 0 var(--gn-s3);
+  }
+  .card h3, .card > h3, .modal-card h3 {
+    font-size: var(--gn-fs-card);
+    line-height: 24px;
+    letter-spacing: 0;
+  }
+  .card h4 { font-size: var(--gn-fs-body); }
+  .hint, .pool-count, .db-home-sub, .modal-sub { font-size: var(--gn-fs-sub); line-height: 20px; }
+}
+
+/* ---------- 3 外壳 ---------- */
+.app { background: var(--gn-bg) !important; }
+
+.sidebar { background: var(--gn-bg) !important; border-right: 1px solid var(--gn-line) !important; }
+.sidebar .brand { border-bottom-color: var(--gn-line) !important; color: var(--gn-text) !important; }
+.sidebar .brand-mark { border-color: var(--gn-line) !important; border-radius: var(--gn-r-ctl); }
+.sidebar .nav-group-hd {
+  color: var(--gn-text-3) !important;
+  border-radius: var(--gn-r-ctl) !important;
+  font-weight: 600;
+}
+.sidebar .nav-group-hd:hover { color: var(--gn-text-2) !important; background: var(--gn-surface) !important; }
+.sidebar .nav-btn {
+  color: var(--gn-text-2) !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: var(--gn-r-ctl) !important;
+  font-weight: 500 !important;
+  box-shadow: none !important;
+}
+.sidebar .nav-btn .nav-ico { color: var(--gn-text-3) !important; }
+.sidebar .nav-btn:hover { background: var(--gn-surface) !important; color: var(--gn-text) !important; }
+/* 导航高亮：品牌红的第一个用处 */
+.sidebar .nav-btn.active {
+  background: var(--gn-red-soft) !important;
+  color: var(--gn-red) !important;
+  font-weight: 600 !important;
+}
+.sidebar .nav-btn.active .nav-ico { color: var(--gn-red) !important; }
+.sidebar .nav-btn .badge, .nbadge {
+  background: var(--gn-red) !important;
+  color: #fff !important;
+  border-radius: 999px !important;
+  font-weight: 600;
+}
+#leadpend-badge { background: var(--gn-red) !important; }
+
+.topbar {
+  background: var(--gn-bg) !important;
+  border-bottom: 1px solid var(--gn-line) !important;
+  box-shadow: none !important;
+}
+/* 顶边那条渐变换成一条实色细线：品牌存在感留着，花哨去掉 */
+.topbar::before { background: var(--gn-red) !important; }
+.topbar .logo, .logo { color: var(--gn-text) !important; font-weight: 600; }
+.topbar .sys-name { color: var(--gn-text-3) !important; font-weight: 500; }
+.user-info, #user-info { color: var(--gn-text-2) !important; }
+
+.content { background: var(--gn-bg); }
+
+@media (min-width: 821px) {
+  .sidebar .nav-btn { font-size: 14.5px !important; }
+  .topbar::before { height: 2px !important; }
+  .user-info, #user-info { font-size: var(--gn-fs-sub); }
+  .content { padding: var(--gn-s5) var(--gn-s6) 48px !important; }
+}
+
+/* ---------- 4 卡片 ---------- */
+.card, .stat-card, .stat, .exp-stat, .ps-stat, .dbh-settle-card, .cust-wrap,
+.crm-tabs, .filter-bar, .empty, .exp-card, .ps-row, .ps-adm-row, .saf-card,
+.pay-card, .as-self-sec, .ld-today-p, .db-kpi, .dt-row, .jd-vbox, .lhi-askbar {
+  border-radius: var(--gn-r-card) !important;
+  box-shadow: none !important;
+}
+.card { background: var(--gn-bg) !important; border: 1px solid var(--gn-line) !important; }
+.card hr { border-top-color: var(--gn-line-soft); }
+
+.stat-card, .stat-grid .stat-card, #ld-stat .stat-card,
+.dash-todo-kpis .stat-card, .stat, .exp-stat, .ps-stat, #ps-admin .ps-stat, .dbh-settle-card, .db-kpi {
+  background: var(--gn-bg) !important;
+  border: 1px solid var(--gn-line) !important;
+  border-left-width: 1px !important;
+  border-left-color: var(--gn-line) !important;
+}
+.stat-card .n, .stat-grid .stat-card .n, #ld-stat .stat-card .n,
+.dash-todo-kpis .stat-card .n, .stat .num, .exp-stat-n, .dbh-settle-card .n, .ps-stat-n {
+  color: var(--gn-text) !important;
+  font-weight: 600 !important;
+  font-variant-numeric: tabular-nums;
+}
+.stat-card .l, .stat-grid .stat-card .l, .stat .lab, .exp-stat-l, .exp-stat-s, .ps-stat-l, .dbh-settle-card .l {
+  color: var(--gn-text-3) !important;
+  font-weight: 400 !important;
+}
+/* 统计数字一律深色：数字是 0 的时候也红着只会让人麻木，提醒交给卡片下面那行小字和待办标签 */
+.stat-card .n[style], .bl-card .bl-card-n, .bl-card-n[style] { color: var(--gn-text) !important; }
+.stat-card[id]:hover, .dash-todo-kpis .stat-card:hover, .stat-card.lhi-ask-card:hover,
+.ld-today-p:hover {
+  border-color: var(--gn-line-strong) !important;
+  background: var(--gn-surface) !important;
+}
+.stat-card.on, .stat-card.lhi-ask-card.on, .stat-card#ld-card-defer3.on {
+  border-color: var(--gn-red) !important;
+  background: var(--gn-red-softer) !important;
+  box-shadow: none !important;
+}
+.stat-card#ld-card-today .l:last-child,
+.stat-card#ld-card-defer3 .l:last-child,
+.ld-today-p .n {
+  color: var(--gn-text-3) !important;
+}
+
+.empty {
+  background: var(--gn-surface) !important;
+  border: 1px dashed var(--gn-line) !important;
+  color: var(--gn-text-3) !important;
+}
+
+@media (min-width: 821px) {
+  .card { padding: var(--gn-s5) var(--gn-s6); }
+  .section > .card, .crm-pane > .card, .as-zone-panel > .card { margin-top: 0; margin-bottom: var(--gn-s4); }
+  .card > h3:first-child, .card > summary + h3 { margin-top: 0; }
+  .card > h3 { margin-bottom: var(--gn-s3); }
+  .card hr { margin: var(--gn-s4) 0; }
+  /* 统计卡：统一成「白底 + 细边 + 深色数字」，去掉各色左边条 */
+  .stat-grid { gap: var(--gn-s3) !important; margin: var(--gn-s3) 0 var(--gn-s4) !important; }
+  .stat-card, .stat-grid .stat-card, #ld-stat .stat-card,
+  .dash-todo-kpis .stat-card, .stat, .exp-stat, .ps-stat, #ps-admin .ps-stat, .dbh-settle-card, .db-kpi {
+    padding: var(--gn-s3) var(--gn-s4) !important;
+  }
+  .stat-card .n, .stat-grid .stat-card .n, #ld-stat .stat-card .n,
+  .dash-todo-kpis .stat-card .n, .stat .num, .exp-stat-n, .dbh-settle-card .n, .ps-stat-n {
+    font-size: 24px !important;
+    line-height: 32px !important;
+    letter-spacing: 0 !important;
+  }
+  .stat-card .l, .stat-grid .stat-card .l, .stat .lab, .exp-stat-l, .exp-stat-s, .ps-stat-l, .dbh-settle-card .l {
+    font-size: var(--gn-fs-cap) !important;
+    line-height: 20px;
+  }
+  .empty { font-size: var(--gn-fs-sub) !important; }
+}
+
+/* ---------- 5 按钮 ---------- */
+.btn {
+  border-radius: var(--gn-r-ctl) !important;
+  font-weight: 500;
+  box-shadow: none !important;
+  transition: background-color .12s, border-color .12s, color .12s;
+}
+
+/* 主按钮：实色品牌红，全站只有这一种「主」 */
+.btn.primary, #view-jobs .btn.primary, #view-jobs #jf-search.btn, .fw-btn, .gn-remind-btn, .pay-formula-bar-btn {
+  background: var(--gn-red) !important;
+  border-color: var(--gn-red) !important;
+  color: #fff !important;
+  font-weight: 600;
+  filter: none !important;
+}
+.btn.primary:hover:not(:disabled), #view-jobs .btn.primary:hover:not(:disabled),
+#view-jobs #jf-search.btn:hover:not(:disabled), .fw-btn:hover, .gn-remind-btn:hover, .pay-formula-bar-btn:hover {
+  background: var(--gn-red-hover) !important;
+  border-color: var(--gn-red-hover) !important;
+  filter: none !important;
+}
+.btn.primary:disabled, .btn.blue:disabled,
+#view-jobs .btn.primary:disabled, #view-jobs .btn.blue:disabled {
+  background: var(--gn-surface) !important;
+  border-color: var(--gn-line) !important;
+  color: var(--gn-text-3) !important;
+  cursor: not-allowed;
+}
+
+/* 次按钮：白底灰边。原来的蓝色按钮（.btn.blue、淡蓝底次按钮）全部归到这一档 */
+.btn:not(.primary):not(.danger):not(.on),
+.btn.ghost:not(.danger):not(.on),
+.btn.blue, #view-jobs .btn.blue,
+#view-jobs .btn:not(.primary):not(.danger):not(.on),
+#view-jobs .btn.ghost:not(.danger):not(.on),
+.btn.tiny.lhi-alive:not(.on), .btn.ghost.ld-intent-btn:not(.on) {
+  background: var(--gn-bg) !important;
+  border: 1px solid var(--gn-line-strong) !important;
+  color: var(--gn-text) !important;
+  filter: none !important;
+}
+.btn:not(.primary):not(.danger):not(.on):hover:not(:disabled),
+.btn.ghost:not(.danger):not(.on):hover,
+.btn.blue:hover:not(:disabled), #view-jobs .btn.blue:hover:not(:disabled),
+#view-jobs .btn:not(.primary):not(.danger):not(.on):hover:not(:disabled),
+.btn.tiny.lhi-alive:not(.on):hover, .btn.ghost.ld-intent-btn:not(.on):hover {
+  background: var(--gn-surface) !important;
+  border-color: var(--gn-text-3) !important;
+  color: var(--gn-text) !important;
+}
+
+/* 危险按钮：白底红字，不做实心大红块 */
+.btn.danger, .btn.ghost.danger {
+  background: var(--gn-bg) !important;
+  border: 1px solid var(--gn-red-line) !important;
+  color: var(--gn-red) !important;
+}
+.btn.danger:hover:not(:disabled) {
+  background: var(--gn-red-soft) !important;
+  border-color: var(--gn-red) !important;
+}
+
+/* 开关型按钮的选中态 */
+.btn.on, .mapbase .btn.small.on, .saf-chip.on, .saf-shop.on, .saf-day.on, .as-ss-it.on {
+  background: var(--gn-red-soft) !important;
+  border-color: var(--gn-red) !important;
+  color: var(--gn-red) !important;
+  box-shadow: none !important;
+}
+
+/* 行内操作按钮：表格里一行好几个，全做成细边小按钮，别让整列变成色块。
+   .btn-op 原本没有边框，这里用内描边（inset 阴影）画线，按钮尺寸一个像素都不变 */
+.btn-op, .btn-op:not(.danger), #view-jobs .btn-op:not(.danger) {
+  background: var(--gn-bg) !important;
+  box-shadow: inset 0 0 0 1px var(--gn-line-strong) !important;
+  color: var(--gn-text) !important;
+  border-radius: var(--gn-r-ctl) !important;
+  font-weight: 500;
+}
+.btn-op:not(.danger):hover, #view-jobs .btn-op:not(.danger):hover {
+  background: var(--gn-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--gn-text-3) !important;
+  color: var(--gn-text) !important;
+}
+/* 行内的危险操作平时也是灰边，悬停才变红：不然每一行一个红字，整列都是红的 */
+.btn-op.danger, #view-jobs .btn-op.danger {
+  background: var(--gn-bg) !important;
+  box-shadow: inset 0 0 0 1px var(--gn-line-strong) !important;
+  color: var(--gn-text-2) !important;
+}
+.btn-op.danger:hover, #view-jobs .btn-op.danger:hover {
+  background: var(--gn-red-soft) !important;
+  box-shadow: inset 0 0 0 1px var(--gn-red) !important;
+  color: var(--gn-red) !important;
+}
+.as-mini, .saf-move, .saf-mv {
+  background: var(--gn-bg) !important;
+  border-color: var(--gn-line-strong) !important;
+  color: var(--gn-text) !important;
+  border-radius: var(--gn-r-ctl) !important;
+}
+.as-mini:hover, .saf-move:hover { background: var(--gn-surface) !important; border-color: var(--gn-text-3) !important; }
+
+@media (min-width: 821px) {
+  /* 电脑端所有按钮统一 1px 边 + 同样的内边距，主次按钮等高（36px） */
+  .btn {
+    font-size: var(--gn-fs-body);
+    line-height: 20px;
+    padding: 7px var(--gn-s4);
+    border-width: 1px;
+    border-style: solid;
+  }
+  .btn.primary { border-color: var(--gn-red); }
+  .btn.small, .btn.ghost { padding: 5px var(--gn-s3); font-size: var(--gn-fs-sub); }
+  /* 表单列里的按钮按内容定宽，不再横向拉满成一整条色带 */
+  .field > .btn { align-self: flex-start; min-width: 96px; }
+  .btn.tiny { padding: 3px 10px; font-size: var(--gn-fs-cap); }
+}
+
+/* ---------- 6 页签 / 分页 ---------- */
+.crm-tabs { background: var(--gn-bg) !important; border: 1px solid var(--gn-line) !important; }
+.crm-tabs .nav-btn, .admin-tab, .exp-tab, .as-tabs .as-tab, .db-tab, .tab, .jregion,
+.job-regions .jregion, .ld-fw-tab, .db-mode-btn, .bl-tab {
+  background: var(--gn-bg) !important;
+  color: var(--gn-text-2) !important;
+  border-color: var(--gn-line) !important;
+  border-radius: var(--gn-r-ctl) !important;
+  box-shadow: none !important;
+  font-weight: 500;
+}
+.crm-tabs .nav-btn { border: 0 !important; }
+.jregion { border: 1px solid var(--gn-line); cursor: pointer; }
+.job-shelf-bar .jregion.active .nbadge { background: var(--gn-red) !important; }
+.crm-tabs .nav-btn:hover, .admin-tab:hover, .exp-tab:hover, .as-tabs .as-tab:hover, .db-tab:hover,
+.tab:hover, .jregion:hover, .ld-fw-tab:hover, .db-mode-btn:hover {
+  background: var(--gn-surface) !important;
+  color: var(--gn-text) !important;
+  border-color: var(--gn-line-strong) !important;
+}
+/* 选中：浅红底 + 红字（导航高亮），不再整块填色 */
+.crm-tabs .nav-btn.active, .admin-tab.active, .exp-tab.active, .as-tabs .as-tab.active,
+.db-tab.active, .tab.active, .jregion.active, .job-regions .jregion.active,
+#view-jobs .jregion.active, #view-jobs .exp-tab.active, .ld-fw-tab.on, .db-mode-btn.active, .bl-tab.active {
+  background: var(--gn-red-soft) !important;
+  color: var(--gn-red) !important;
+  border-color: var(--gn-red-line) !important;
+  font-weight: 600;
+  box-shadow: none !important;
+}
+.ld-fw-tab.ld-fw-hire {
+  background: var(--gn-bg) !important;
+  color: var(--gn-st-done-fg) !important;
+  border-color: var(--gn-st-done-line) !important;
+}
+.ld-fw-tab.ld-fw-hire:hover { background: var(--gn-st-done-bg) !important; }
+.as-zone { border-bottom-color: var(--gn-line) !important; }
+.as-zone .as-ztab { color: var(--gn-text-2) !important; }
+.as-zone .as-ztab.active { color: var(--gn-red) !important; border-bottom-color: var(--gn-red) !important; }
+
+.pager .pg-num {
+  border-radius: var(--gn-r-ctl) !important;
+  border-color: var(--gn-line) !important;
+  color: var(--gn-text-2);
+  background: var(--gn-bg);
+}
+.pager .pg-num:hover {
+  border-color: var(--gn-line-strong) !important;
+  color: var(--gn-text) !important;
+  background: var(--gn-surface) !important;
+}
+.pager .pg-num.cur {
+  background: var(--gn-red-soft) !important;
+  border-color: var(--gn-red) !important;
+  color: var(--gn-red) !important;
+  font-weight: 600;
+}
+
+@media (min-width: 821px) {
+  .crm-tabs { padding: var(--gn-s1) !important; }
+  .jregion {
+    padding: 5px var(--gn-s3);
+    font-size: var(--gn-fs-sub);
+    line-height: 20px;
+  }
+}
+
+/* ---------- 7 表单 ---------- */
+/* :where() 不加权重：有自己尺寸的专用输入框（表格里的小格子等）保持原样，只给"裸"控件兜底 */
+:where(.main, .modal, .cdrawer, .ld-drawer) :where(input[type="text"], input[type="search"], input[type="number"],
+input[type="password"], input[type="tel"], input[type="date"], input[type="month"], input[type="time"],
+input:not([type]), select, textarea) {
+  border: 1px solid var(--gn-line-strong);
+  border-radius: var(--gn-r-ctl);
+  color: var(--gn-text);
+  background: var(--gn-bg);
+  outline: none;
+}
+.main input, .main select, .main textarea,
+.modal input, .modal select, .modal textarea,
+.cdrawer input, .cdrawer select, .cdrawer textarea,
+.ld-drawer input, .ld-drawer select, .ld-drawer textarea,
+.auth-form input, .auth-form select {
+  border-radius: var(--gn-r-ctl) !important;
+  border-color: var(--gn-line-strong);
+}
+.main input:focus, .main select:focus, .main textarea:focus,
+.modal input:focus, .modal select:focus, .modal textarea:focus,
+.cdrawer input:focus, .cdrawer select:focus, .cdrawer textarea:focus,
+.ld-drawer input:focus, .ld-drawer select:focus, .ld-drawer textarea:focus,
+.auth-form input:focus, .auth-form select:focus {
+  border-color: var(--gn-red) !important;
+  box-shadow: 0 0 0 2px rgba(224, 0, 18, .10) !important;
+  outline: none;
+}
+.main input[type="checkbox"], .main input[type="radio"],
+.modal input[type="checkbox"], .modal input[type="radio"],
+.ld-drawer input[type="checkbox"], .ld-drawer input[type="radio"] {
+  accent-color: var(--gn-text);
+  box-shadow: none !important;
+}
+::placeholder { color: var(--gn-text-3); opacity: 1; }
+.field label, .filter-bar .field label, .form-grid label, .modal-card label, .auth-form label {
+  color: var(--gn-text-2) !important;
+  font-weight: 500 !important;
+}
+
+/* 筛选栏：浅灰底把"筛选"和"结果"分开，控件等高 */
+.filter-bar { background: var(--gn-surface) !important; border: 1px solid var(--gn-line-soft) !important; }
+.filter-bar select, .filter-bar input[type="search"], .filter-bar input[type="text"],
+.filter-bar input[type="date"], .filter-bar input[type="month"] {
+  background-color: var(--gn-bg) !important;
+}
+
+@media (min-width: 821px) {
+  :where(.main, .modal, .cdrawer, .ld-drawer) :where(input[type="text"], input[type="search"], input[type="number"],
+  input[type="password"], input[type="tel"], input[type="date"], input[type="month"], input[type="time"],
+  input:not([type]), select, textarea) {
+    padding: 6px 10px;
+    font-size: var(--gn-fs-body);
+    line-height: 20px;
+  }
+  .field label, .filter-bar .field label, .form-grid label, .modal-card label, .auth-form label {
+    font-size: var(--gn-fs-sub) !important;
+  }
+  .filter-bar {
+    padding: var(--gn-s3) var(--gn-s4) !important;
+    gap: var(--gn-s3) var(--gn-s4) !important;
+    margin-bottom: var(--gn-s4) !important;
+  }
+  .filter-bar select, .filter-bar input[type="search"], .filter-bar input[type="text"],
+  .filter-bar input[type="date"], .filter-bar input[type="month"] {
+    height: 34px;
+    padding: 6px 10px !important;
+    font-size: var(--gn-fs-body) !important;
+  }
+  .filter-bar .btn { height: 34px; padding: 6px var(--gn-s5) !important; }
+}
+
+/* ---------- 8 表格 ---------- */
+.cust-wrap, .ld-sched-wrap { border: 1px solid var(--gn-line) !important; background: var(--gn-bg) !important; }
+.table-wrap, .cust-wrap, .ld-sched-wrap { -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
+.table-wrap > table { border: 1px solid var(--gn-line); }
+.main table { font-variant-numeric: tabular-nums; }
+.main th, .modal th {
+  background: var(--gn-surface) !important;
+  color: var(--gn-text-2) !important;
+  font-weight: 600 !important;
+  border-bottom: 1px solid var(--gn-line) !important;
+}
+.main td, .modal td { border-bottom-color: var(--gn-line-soft); color: var(--gn-text); }
+@media (min-width: 821px) {
+  .dash-table th, .ld-table th, .cust-table th, .user-table th, .asset-table th, .pay-table th {
+    padding-top: 9px;
+    padding-bottom: 9px;
+  }
+  .dash-table td, .ld-table td, .cust-table td, .user-table td, .asset-table td, .pay-table td {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+}.cust-table tbody tr.cust-main:hover td,
+.cust-table tbody tr.cust-main:hover td.c-act,
+.user-table tbody tr:hover td, .dash-table tbody tr:hover td, .asset-table tbody tr:hover td,
+.pay-table tbody tr:hover td, .lhi-table tbody tr:hover td, .lof-table tbody tr:hover td {
+  background: var(--gn-surface);
+}
+.cust-table thead th.c-act { background: var(--gn-surface) !important; }
+.cust-table th.c-act, .cust-table td.c-act { box-shadow: -1px 0 0 var(--gn-line) !important; }
+.cust-table tbody tr.follow-row > td { background: var(--gn-surface) !important; }
+/* 分组行 / 合计行：只用灰阶分层 */
+.dash-table tr.wxd-grp td, .saf-table tr.saf-grp td {
+  background: var(--gn-surface) !important;
+  color: var(--gn-text) !important;
+}
+.dash-table tr.wxd-grp-sum td, .dash-table tfoot tr.wxd-sum td,
+.dash-table tfoot tr.wxd-all-sum td, .as-sum-total td {
+  background: var(--gn-surface) !important;
+  color: var(--gn-text) !important;
+  font-weight: 600 !important;
+}
+.as-sum-none td { background: var(--gn-bg) !important; color: var(--gn-text-3) !important; }
+.wxd-me td { border-left-color: var(--gn-red) !important; }
+.wxd-me-k { background: var(--gn-red) !important; }
+.wxd-mx .mx-td { background: var(--gn-red-softer) !important; }
+.wxd-preoff td {
+  background: var(--gn-surface) !important;
+  color: var(--gn-text-2) !important;
+  border-left-color: var(--gn-line-strong) !important;
+}
+.wxd-preoff b { color: var(--gn-text-2) !important; }
+
+@media (min-width: 821px) {
+  .main th, .modal th { font-size: var(--gn-fs-sub) !important; }
+  .tree-head, .owner-head, .team-block-name { font-size: 15px; }
+}
+
+/* ---------- 9 状态标签（四色） ---------- */
+.st-tag, .status-tag, .ld-st, .exp-st, .ps-state, .db-tag, .db-st, .jtag, .jpst, .as-tag, .rg-tag,
+.bl-tag, .ochip, .ld-sec-tag, .as-sst-pill, .as-si-tag, .ld-intent, .ld-g, .ldc-grade, .ld-self,
+.ld-proxy-tag, .saf-dup, .ps-unbound, .as-ar-tag, .as-cf, .as-ar-flag, .gs-ro {
+  border-radius: var(--gn-r-tag) !important;
+  font-weight: 500;
+  box-shadow: none !important;
+}
+
+/* 紧急跟进 = 品牌红（实心）：该马上处理的状态、已经超时的 */
+.ld-st-need, .db-tag.late, .db-tag.miss, .db-tag.warn, .db-st.wait, .ps-st-disputed, .ldc-late-tag,
+.fw-node-late, .st-tag[style*="#8e44ad" i], .st-tag[style*="#A32D2D" i], .st-tag[style*="#dc2626" i] {
+  background: var(--gn-st-urgent-bg) !important;
+  color: var(--gn-st-urgent-fg) !important;
+  border-color: var(--gn-st-urgent-bg) !important;
+}
+/* 紧急（快到点 / 需留意）：同一个红，只描边不填色 */
+.db-tag.soon, .saf-dup, .ps-unbound, .as-cf, .as-ar-flag, .ld-proxy-tag,
+.st-tag[style*="#f59e0b" i] {
+  background: var(--gn-bg) !important;
+  color: var(--gn-red) !important;
+  border: 1px solid var(--gn-red-line) !important;
+}
+
+/* 正常跟进 = 浅蓝：流程走到一半、在等下一步 */
+.ld-st-sent, .ld-st-booked, .ld-st-arrived, .ld-st-wait, .ld-st-defer,
+.status-tag.st-pending, .exp-st-pending, .exp-st-approved, .ps-st-published, .ps-st-viewed,
+.db-tag.todo, .db-st.done, .ld-intent.no, .as-sst-submitted, .as-ar-submitted,
+.st-tag[style*="#16a085" i], .st-tag[style*="#d35400" i], .st-tag[style*="#2563eb" i],
+.st-tag[style*="#BA7517" i], .st-tag[style*="#185FA5" i], .jtag[style*="#BA7517" i] {
+  background: var(--gn-st-normal-bg) !important;
+  color: var(--gn-st-normal-fg) !important;
+  border-color: var(--gn-st-normal-line) !important;
+}
+
+/* 已成交 = 浅绿：入职、通过、已付、已签收 */
+.ld-st-done, .status-tag.st-approved, .exp-st-paid, .ps-st-acked, .db-st.ok,
+.as-sst-approved, .as-ar-approved, .as-si-tag, .jpst.ok, .ochip.ok, .owner-head .ochip.ok,
+.ld-intent.ok, .as-link-ok, .as-dev-on, .wxm-team-n.ok, .st-tag[style*="#27ae60" i],
+.st-tag[style*="#1D9E75" i], .jtag[style*="#27AE60" i] {
+  background: var(--gn-st-done-bg) !important;
+  color: var(--gn-st-done-fg) !important;
+  border-color: var(--gn-st-done-line) !important;
+}
+
+/* 无效 / 放弃 = 浅灰：下架、驳回、撤回、草稿、停用 */
+.ld-st-drop, .ld-st-off, .status-tag.st-rejected, .exp-st-rejected, .exp-st-withdrawn, .ps-st-draft,
+.db-st.def, .db-st.rej, .st-tag.jd-none, .jtag.none, .ochip.warn, .owner-head .ochip.warn,
+.st-tag[style*="#9e9e9e" i], .st-tag[style*="#888" i], .st-tag[style*="#5f5e5a" i],
+.jtag[style*="#A32D2D" i] {
+  background: var(--gn-st-off-bg) !important;
+  color: var(--gn-st-off-fg) !important;
+  border-color: var(--gn-st-off-line) !important;
+}
+
+/* 报销详情头部跟着同一套状态色 */
+.exp-d-head.exp-st-pending, .exp-d-head.exp-st-approved {
+  background: var(--gn-st-normal-bg) !important;
+  color: var(--gn-st-normal-fg) !important;
+}
+.exp-d-head.exp-st-paid { background: var(--gn-st-done-bg) !important; color: var(--gn-st-done-fg) !important; }
+.exp-d-head.exp-st-rejected, .exp-d-head.exp-st-withdrawn {
+  background: var(--gn-st-off-bg) !important;
+  color: var(--gn-st-off-fg) !important;
+}
+
+/* 分类标签（区域 / 等级 / 角色 / 资产类型）：不是状态，一律中性灰描边 */
+.rg-tag, .rg-gd, .rg-lz, .pc-role, .as-tag, .as-tag-b, .ld-g, .ld-g-A, .ld-g-B, .ld-g-C, .ldc-grade,
+.ld-sec-tag, .ld-self, .gs-head .gs-ro, .wxd-chip, .ld-b-chip, .saf-cur, .ld-who-boss {
+  background: var(--gn-bg) !important;
+  color: var(--gn-text-2) !important;
+  border: 1px solid var(--gn-line-strong) !important;
+}
+/* 黑名单标记是真警示，保留品牌红 */
+.bl-tag {
+  background: var(--gn-red) !important;
+  color: #fff !important;
+  border-color: var(--gn-red) !important;
+}
+
+/* ---------- 10 提示 / 横幅 ---------- */
+/* 原来的黄 / 橙提示框统一成「灰底说明框」；真正的提醒只让文字变红 */
+.pc-behalf, .warn-region, .cooldown, .jd-fix, .je-notetip, .db-hint, .rc-why, .team-ov, .as-warn,
+.as-per-warn, .as-link-left, .ld-stale, .ld-review .ld-rv-note, #ld-defer3-bar, .ps-nudge, .ps-ack-wait,
+.ps-dups, .download-tip, .tip, #pay-my-rolehint .pay-rolehint, .pay-card > .pay-rolehint, .as-forbar,
+.as-filter-bar, .je-day-item.fixed, .as-noreal, .lhi-done, .ps-ack-ok {
+  background: var(--gn-surface) !important;
+  border-color: var(--gn-line) !important;
+  color: var(--gn-text-2) !important;
+  border-radius: var(--gn-r-ctl) !important;
+  box-shadow: none !important;
+}
+.pc-behalf b, .je-notetip b, .db-hint b, .rc-why b, #pay-my-rolehint .pay-rolehint b,
+.pay-card > .pay-rolehint b, .tip b:first-of-type, .tip .tip-warn {
+  color: var(--gn-text) !important;
+}
+.je-form .je-f.fixed input, .je-form .je-f.fixed textarea {
+  background: var(--gn-surface) !important;
+  border-color: var(--gn-line-strong) !important;
+}
+.je-form .je-f.fixed label::after, .jd-ov::after { color: var(--gn-text-3) !important; }
+.jd-ov { border-bottom-color: var(--gn-line-strong) !important; }
+
+/* 需要人处理的横幅：白底 + 左侧一道品牌红 + 红色标题 */
+.ld-warn-bar, .ld-review, .lhi-askbar, .gn-remind-bar .gn-remind-inner, .pay-formula-bar .pay-formula-bar-inner,
+.dash-today-card, .dt-row.dt-hot, .pay-card.pay-pending {
+  background: var(--gn-bg) !important;
+  border: 1px solid var(--gn-red-line) !important;
+  border-left: 3px solid var(--gn-red) !important;
+  color: var(--gn-text) !important;
+  box-shadow: none !important;
+}
+.dt-row.dt-hot:hover { background: var(--gn-red-softer) !important; }
+.ld-warn-item {
+  background: var(--gn-red-softer) !important;
+  border-color: var(--gn-red-line) !important;
+  color: var(--gn-text) !important;
+}
+.ld-warn-bar b, .ld-review .ld-rv-h, .ld-review .ld-rv-who, .lhi-askbar .tx b,
+#gn-remind-title, #pay-formula-bar-title, #ld-itvmiss .ld-im-t {
+  color: var(--gn-red) !important;
+}
+.ld-review .ld-rv-tip, .lhi-askbar .tx span, #gn-remind-sub, #pay-formula-bar-sub {
+  color: var(--gn-text-2) !important;
+}
+.lhi-askbar .ico { background: var(--gn-red) !important; }
+
+/* 提醒文字：超时、待办数、到点 —— 品牌红的最后一个用处 */
+.pc-due, .ldc-soon .ldc-clock, .ld-clock.on, .lst-d td .ld-late-n, .arr-table .arr-note,
+.ld-now-btn.soon, .ld-b-warn-t, .ld-b-dup-t, .msg.err {
+  color: var(--gn-red) !important;
+}
+.msg.ok { color: var(--gn-st-done-fg) !important; }
+.ld-now-btn.soon { border-color: var(--gn-red-line) !important; background: var(--gn-bg) !important; }
+
+/* 折叠说明、页内文字链接：深灰，悬停才变红 */
+.tip-fold > summary, .hint-more > summary, .arr-hint > summary, .dt-row.dt-item .dt-go,
+.wxm-lb-go, .dbh-settle-go, .ps-selinfo, .as-link-man, .saf-card-t b, .saf-table tr.saf-grp td {
+  color: var(--gn-text-2) !important;
+}
+.tip-fold > summary:hover, .hint-more > summary:hover, .arr-hint > summary:hover,
+.dbh-settle-sum:hover .dbh-settle-go {
+  color: var(--gn-red) !important;
+}
+.tip-q {
+  background: var(--gn-surface) !important;
+  color: var(--gn-text-2) !important;
+  border-color: var(--gn-line-strong) !important;
+}
+.as-link-man, .as-link-item.on, .saf-cur, .as-forbar { border-color: var(--gn-line) !important; }
+
+/* 在线 / 完成的小圆点保留绿色，其余强调点收灰 */
+.wxd-on.y, .ld-live i, .wxm-linkbar.ok .wxm-lb-dot {
+  background: var(--gn-st-done-fg) !important;
+  box-shadow: none !important;
+}
+.wxd-on-n, .wxm-linkbar.ok .wxm-lb-t, .wxm-big.wxm-ok, .wxm-row.done .wxm-st, .dash-table .db-strong,
+.lhi-done, .ps-ack-ok, .ps-disp-r, .db-kpi .s.up {
+  color: var(--gn-st-done-fg) !important;
+}
+.wxd-row .wxd-add, .wxd-mx .mx-add, .wxd-mx .mx-c i, .wxd-chip .wxd-chip-add, .wxd-in .wxd-add {
+  color: var(--gn-st-done-fg) !important;
+}
+.wxm-linkbar {
+  border-radius: var(--gn-r-ctl) !important;
+  background: var(--gn-surface) !important;
+  border-color: var(--gn-line) !important;
+}
+.wxm-linkbar.ok { border-left-color: var(--gn-st-done-fg) !important; }
+.wxm-row.miss .wxm-st { color: var(--gn-red) !important; }
+.ps-bar i { background: var(--gn-st-done-fg) !important; }
+.ps-row:hover, .saf-card:hover, .ps-adm-row.on {
+  border-color: var(--gn-line-strong) !important;
+  box-shadow: none !important;
+}
+.ps-adm-row.on { border-color: var(--gn-red) !important; background: var(--gn-red-softer) !important; }
+.saf-card { border-left: 1px solid var(--gn-line) !important; }
+.ps-chk input, .ps-selall input { accent-color: var(--gn-text) !important; }
+.select-all, .select-all-bar .select-all { color: var(--gn-text) !important; font-weight: 500; }
+/* 门店名单里的筛选片、日期片：悬停只加深灰边，聚焦才用品牌红 */
+.saf-chip:hover, .saf-shop:hover, .saf-day:hover {
+  border-color: var(--gn-text-3) !important;
+  color: var(--gn-text) !important;
+  box-shadow: none !important;
+}
+.saf-fil-q:focus { border-color: var(--gn-red) !important; box-shadow: 0 0 0 2px rgba(224, 0, 18, .10) !important; }
+.saf-edit-table td.saf-td.editable:hover { box-shadow: inset 0 0 0 1px var(--gn-line-strong) !important; }
+.stat-card.lhi-ask-card:focus-visible { outline-color: var(--gn-red-line) !important; }
+.exp-thumb-doc, .ld-b-chip i { color: var(--gn-text-3) !important; }
+.exp-up-btn { border-color: var(--gn-line-strong) !important; }
+.ld-proxy { color: var(--gn-red) !important; }
+.as-pname { text-decoration-color: var(--gn-line-strong) !important; }
+.saf-inp { border-color: var(--gn-red) !important; }
+.exp-d-avatar, .ld-av { background: var(--gn-surface) !important; color: var(--gn-text-2) !important; }
+.ld-bub-r .ld-bub {
+  background: var(--gn-surface) !important;
+  border-color: var(--gn-line) !important;
+  color: var(--gn-text) !important;
+}
+.ld-drawer-head #ld-d-title .ld-d-tel, .ldc-nm .ldc-tel {
+  color: var(--gn-text-2) !important;
+  border-color: var(--gn-line-strong) !important;
+  background: var(--gn-bg) !important;
+  border-radius: var(--gn-r-tag) !important;
+}
+.as-sum .g-hold, .as-s-hold .h, .as-sum .g-real, .as-s-real .h {
+  background: var(--gn-surface) !important;
+  color: var(--gn-text-2) !important;
+}
+.as-obj-item.done, .as-ad-item.on {
+  background: var(--gn-surface) !important;
+  border-color: var(--gn-line-strong) !important;
+}
+.ld-sched-t td.cell.w { background: var(--gn-bg) !important; color: var(--gn-text-2) !important; }
+.ld-sched-t td.cell.r { background: var(--gn-st-off-bg) !important; color: var(--gn-st-off-fg) !important; }
+.ld-sched-t thead th.sun, .ld-sched-t thead th.col.sun:hover, .ld-sched-t thead th.col:hover {
+  color: var(--gn-text-2) !important;
+}
+.ld-sched-t td.cell.sun { border-right-color: var(--gn-line) !important; }
+#jobs-map-canvas .jnav, .jnav, .jfixon { background: var(--gn-text) !important; }
+.jnav:hover { background: var(--gn-text-2) !important; }
+.jd-vbox .jd-vph { color: var(--gn-text-3) !important; }
+.job-table th.j-pay, .job-table td.j-pay, .cd-v, .owner-head, .tree-head,
+.ps-row-period, .ps-adm-name, .ps-period, .ps-line-sum {
+  color: var(--gn-text) !important;
+}
+.owner-head, .tree-head, .team-head, .group-head, .sales-head, .team-block-head {
+  background: var(--gn-surface) !important;
+  border-left: 3px solid var(--gn-line-strong) !important;
+  border-radius: var(--gn-r-ctl) !important;
+  color: var(--gn-text) !important;
+  filter: none !important;
+}
+.team-block-head {
+  border-left: 0 !important;
+  border-radius: 0 !important;
+  border-bottom: 1px solid var(--gn-line) !important;
+}
+.tree-head:hover { background: var(--gn-line-soft) !important; }
+.owner-head .oname { font-weight: 600; }
+.owner-head .ogrp-toggle {
+  background: var(--gn-bg) !important;
+  border: 1px solid var(--gn-line-strong) !important;
+  border-radius: var(--gn-r-ctl) !important;
+  color: var(--gn-text) !important;
+}
+.owner-head .ogrp-toggle:hover { background: var(--gn-surface) !important; }
+.team-block { border-color: var(--gn-line) !important; border-radius: var(--gn-r-card) !important; }
+.team-warn { color: var(--gn-red) !important; }
+.pipeline .step {
+  background: var(--gn-surface) !important;
+  border-color: var(--gn-line) !important;
+  border-radius: var(--gn-r-ctl) !important;
+}
+
+.toast { border-radius: var(--gn-r-ctl) !important; box-shadow: 0 4px 16px rgba(31, 35, 41, .12) !important; }
+.toast.ok { background: var(--gn-text) !important; }
+.toast.err { background: var(--gn-red) !important; }
+
+/* ---------- 11 跟进表行色 ---------- */
+/* 行底色只保留两种含义：红 = 超时 / 快到点；蓝 = 正常等回话。其余一律白底 */
+.ld-table tbody tr:hover td { background: var(--gn-surface); }
+.ld-table tr.ld-r-late td,
+.ld-table tr.ld-r-mine.ld-r-late td,
+.team-bad td {
+  background: var(--gn-red-soft) !important;
+}
+.ld-table tr.ld-r-late:hover td { background: #ffe8ea !important; }
+.ld-table tr.ld-r-late td:first-child { box-shadow: inset 3px 0 0 var(--gn-red) !important; }
+.ld-table tr.ld-r-soon:not(.ld-r-late) td { background: var(--gn-red-softer) !important; }
+.ld-table tr.ld-r-soon:not(.ld-r-late):hover td { background: var(--gn-red-soft) !important; }
+.ld-table tr.ld-r-soon:not(.ld-r-late):not(.ld-r-need) td:first-child {
+  box-shadow: inset 3px 0 0 var(--gn-red-line) !important;
+}
+.ld-table tr.ld-r-need td:first-child { box-shadow: inset 3px 0 0 var(--gn-red) !important; }
+.ld-table tr.ld-r-call:not(.ld-r-late):not(.ld-r-soon) td,
+.ld-table tr.ld-r-pend:not(.ld-r-late):not(.ld-r-soon):not(.ld-r-call) td,
+.lpend-row-warn td, .ld-b-warn td {
+  background: #f6faff !important;
+}
+.ld-table tr.ld-r-call:not(.ld-r-late):not(.ld-r-soon):hover td,
+.ld-table tr.ld-r-pend:not(.ld-r-late):not(.ld-r-soon):not(.ld-r-call):hover td {
+  background: var(--gn-st-normal-bg) !important;
+}
+.ld-table tr.ld-r-call:not(.ld-r-late):not(.ld-r-soon) td:first-child,
+.ld-table tr.ld-r-pend:not(.ld-r-late):not(.ld-r-soon):not(.ld-r-call):not(.ld-r-need) td:first-child {
+  box-shadow: inset 3px 0 0 var(--gn-st-normal-line) !important;
+}
+/* 抽屉里的进度条：走过的节点用深灰，只有「当前这一步」是红的 */
+.ldc-step.done i { background: var(--gn-text-2) !important; border-color: var(--gn-text-2) !important; }
+.ldc-step.done + .ldc-step::before, .ldc-step.done + .ldc-step.done::before {
+  background: var(--gn-text-2) !important;
+}
+.ldc-cnt-i > b.z { color: var(--gn-text-3) !important; }
+.ld-bub { border-radius: var(--gn-r-card) !important; }
+.ldc-soon {
+  background: var(--gn-red-softer) !important;
+  border-color: var(--gn-red-line) !important;
+  border-left-color: var(--gn-red) !important;
+}
+
+/* 手机端跟进表是「一行一张卡」，底色和左边条画在 tr 上，同一套含义再接一遍 */
+@media (max-width: 640px) {
+  .ld-table tr.ld-r-need { border-left-color: var(--gn-red) !important; }
+  .ld-table tr.ld-r-late { background: var(--gn-red-soft) !important; }
+  .ld-table tr.ld-r-soon:not(.ld-r-late) { background: var(--gn-red-softer) !important; }
+  .ld-table tr.ld-r-soon:not(.ld-r-late):not(.ld-r-need) { border-left-color: var(--gn-red-line) !important; }
+  .ld-table tr.ld-r-call:not(.ld-r-late):not(.ld-r-soon),
+  .ld-table tr.ld-r-pend:not(.ld-r-late):not(.ld-r-soon):not(.ld-r-call),
+  .ld-table tr.lpend-row-warn { background: #f6faff !important; }
+  .ld-table tr.ld-r-call:not(.ld-r-late):not(.ld-r-soon):not(.ld-r-need),
+  .ld-table tr.ld-r-pend:not(.ld-r-late):not(.ld-r-soon):not(.ld-r-call):not(.ld-r-need) {
+    border-left-color: var(--gn-st-normal-line) !important;
+  }
+}
+
+/* ---------- 12 弹层 / 抽屉 ---------- */
+.modal-card {
+  border-radius: var(--gn-r-card) !important;
+  box-shadow: 0 12px 32px rgba(31, 35, 41, .16) !important;
+  border: 1px solid var(--gn-line);
+}
+.cdrawer, .ld-drawer-panel { box-shadow: -8px 0 24px rgba(31, 35, 41, .10) !important; }
+.cdrawer-head, .ld-drawer-head {
+  background: var(--gn-bg) !important;
+  border-bottom: 1px solid var(--gn-line) !important;
+}
+.cdrawer-x:hover, .jd-m .jd-mb button:hover, .jd-m .jd-mb a:hover {
+  background: var(--gn-surface) !important;
+  border-color: var(--gn-line-strong) !important;
+  color: var(--gn-text) !important;
+}
+.auth-card::before { display: none !important; }
+
+@media (min-width: 821px) {
+  .modal-actions { gap: var(--gn-s2); }
+}
+
+/* ---------- 12b 去特效 ---------- */
+/* 毛玻璃、发光、渐变、悬停上浮、网格底纹全部撤掉：这是天天用的业务后台，稳比炫重要 */
+.main *, .modal * { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+#view-dashboard::before { display: none !important; }
+.sidebar .nav-btn.active .nav-ico { filter: none !important; }
+.stat-grid .stat-card:hover, .ratio-card:hover, .stat-card[id]:hover, .ps-row:hover,
+.stat-card.lhi-ask-card:hover, .saf-card:hover, .db-kpi:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+.db-kpi, .db-home-card, .db-mode-tog, .db-bell, .dbh-pay-card, .ps-block, .as-tabs, .ratio-card {
+  background: var(--gn-bg) !important;
+  border: 1px solid var(--gn-line) !important;
+  border-radius: var(--gn-r-card) !important;
+  box-shadow: none !important;
+}
+.db-home-card > .hd h3 { font-weight: 600 !important; color: var(--gn-text) !important; }
+.db-kpi .k { color: var(--gn-text-3) !important; font-weight: 500 !important; }
+.db-kpi .n { font-weight: 600 !important; color: var(--gn-text) !important; }
+.db-kpi .n.soon { color: var(--gn-text-3) !important; }
+.db-kpi .s { color: var(--gn-text-3) !important; }
+.db-kpi .s.bad { color: var(--gn-red) !important; font-weight: 500 !important; }
+.db-kpi .s.up { font-weight: 500 !important; }
+.db-kpi .spark svg * { stroke: var(--gn-text-3) !important; }
+.db-mode-tog { border-radius: var(--gn-r-ctl) !important; }
+.db-mode-btn { border: 0 !important; font-weight: 500 !important; }
+.db-bell { border-radius: var(--gn-r-ctl) !important; color: var(--gn-text-2) !important; }
+.db-bell .dot { box-shadow: none !important; background: var(--gn-red) !important; }
+.db-chip {
+  background: var(--gn-bg) !important;
+  border: 1px solid var(--gn-line) !important;
+  border-radius: var(--gn-r-tag) !important;
+  color: var(--gn-text-3) !important;
+}
+.db-todo-item, .db-itv-item {
+  background: var(--gn-bg) !important;
+  border: 1px solid var(--gn-line) !important;
+  border-radius: var(--gn-r-ctl) !important;
+  color: var(--gn-text) !important;
+}
+.db-todo-item:hover { background: var(--gn-surface) !important; border-color: var(--gn-line-strong) !important; }
+.db-todo-item .t { font-weight: 500 !important; color: var(--gn-text) !important; }
+.db-todo-item .d, .db-itv-item .sub { color: var(--gn-text-3) !important; }
+.db-todo-item.hot, .db-itv-item.bad {
+  border-color: var(--gn-red-line) !important;
+  background: var(--gn-bg) !important;
+}
+.db-todo-item.hot .t, .db-todo-item.hot .d, .db-itv-item.bad, .db-itv-item.bad .sub {
+  color: var(--gn-red) !important;
+}
+.db-itv-item { font-weight: 500 !important; }
+.db-mini-table th {
+  background: transparent !important;
+  color: var(--gn-text-3) !important;
+  border-bottom-color: var(--gn-line) !important;
+}
+.db-mini-table td { color: var(--gn-text) !important; border-bottom-color: var(--gn-line-soft) !important; }
+.db-mini-table tr.bad td { background: var(--gn-red-softer) !important; color: var(--gn-red) !important; }
+.db-tag, .db-st { font-weight: 500 !important; }
+.db-conv-row .bar {
+  background: var(--gn-line-soft) !important;
+  box-shadow: none !important;
+  border-radius: var(--gn-r-tag) !important;
+}
+.db-conv-row .bar > i {
+  background: var(--gn-red) !important;
+  box-shadow: none !important;
+  border-radius: var(--gn-r-tag) !important;
+}
+.db-conv-row .num, .db-conv-row .lab { color: var(--gn-text) !important; font-weight: 500 !important; }
+.db-empty {
+  background: var(--gn-surface) !important;
+  border: 1px dashed var(--gn-line) !important;
+  border-radius: var(--gn-r-ctl) !important;
+  color: var(--gn-text-3) !important;
+}
+.db-empty .hint { color: var(--gn-text-3) !important; }
+/* 空态里的引导按钮降成次按钮：一屏里好几个空卡时，不能个个都是大红钮 */
+.db-empty .cta {
+  background: var(--gn-bg) !important;
+  border: 1px solid var(--gn-line-strong) !important;
+  border-radius: var(--gn-r-ctl) !important;
+  color: var(--gn-text) !important;
+  font-weight: 500 !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+.db-empty .cta:hover { background: var(--gn-surface) !important; border-color: var(--gn-text-3) !important; }
+.dbh-pay-card, .dbh-pay-card[style], .dbh-settle-card[style] { border-left: 1px solid var(--gn-line) !important; }
+.dbh-pay-card .n, .dbh-pay-card .n[style] { color: var(--gn-text) !important; font-weight: 600 !important; }
+.dbh-settle-sum:hover { background: transparent !important; }
+.dbh-settle-sum:focus-visible { outline-color: var(--gn-red-line) !important; }
+.ps-net, .ps-block-admin, .stat-card.lhi-ask-card { background: var(--gn-bg) !important; }
+.as-ss-list, .gs-drop, #ld-itvmiss .ld-im-card {
+  box-shadow: 0 8px 24px rgba(31, 35, 41, .12) !important;
+  border-radius: var(--gn-r-card) !important;
+}
+.wxm-linkbar:hover { box-shadow: none !important; }
+.ld-live i { animation: none !important; }
+
+/* 钉顶提醒条：整条大红渐变改成白底 + 红色左边条，提醒靠文字和按钮，不靠铺色 */
+.gn-remind-bar, .pay-formula-bar {
+  background: var(--gn-bg) !important;
+  border: 1px solid var(--gn-red-line) !important;
+  border-left: 3px solid var(--gn-red) !important;
+  border-radius: var(--gn-r-card) !important;
+  box-shadow: 0 2px 8px rgba(31, 35, 41, .06) !important;
+  color: var(--gn-text) !important;
+}
+.gn-remind-bar .gn-remind-inner, .pay-formula-bar .pay-formula-bar-inner {
+  border: 0 !important;
+  background: transparent !important;
+}
+.gn-remind-txt b, .pay-formula-bar-txt b { color: var(--gn-red) !important; font-weight: 600 !important; }
+.gn-remind-txt span, .pay-formula-bar-txt span { color: var(--gn-text-2) !important; opacity: 1 !important; }
+.gn-remind-btn, .pay-formula-bar-btn { border-radius: var(--gn-r-ctl) !important; box-shadow: none !important; }
+
+/* 「现在跟进」：超时 = 实心红（紧急），快到点 = 红描边 */
+.ld-now-btn {
+  background: var(--gn-red) !important;
+  border: 1px solid var(--gn-red) !important;
+  border-radius: var(--gn-r-ctl) !important;
+  box-shadow: none !important;
+  font-weight: 600 !important;
+  filter: none !important;
+}
+.ld-now-btn:hover { background: var(--gn-red-hover) !important; }
+.ld-now-btn.soon {
+  background: var(--gn-bg) !important;
+  color: var(--gn-red) !important;
+  border: 1px solid var(--gn-red-line) !important;
+}
+.ld-now-btn.soon:hover { background: var(--gn-red-soft) !important; }
+
+@media (min-width: 821px) {
+  .db-home-card { padding: var(--gn-s4) var(--gn-s5) !important; margin-bottom: var(--gn-s4) !important; }
+  .db-home-card > .hd h3 { font-size: var(--gn-fs-card) !important; }
+  .db-home-grid, .db-kpi-grid { gap: var(--gn-s4) !important; }
+  .db-kpi-grid { margin-bottom: var(--gn-s4) !important; }
+  .db-kpi .k { font-size: var(--gn-fs-sub) !important; }
+  .db-kpi .n {
+    font-size: 28px !important;
+    line-height: 36px !important;
+    letter-spacing: 0 !important;
+  }
+  .db-kpi .n.soon { font-size: 20px !important; }
+  .db-kpi .s { font-size: var(--gn-fs-cap) !important; }
+  .db-mode-tog { padding: 2px !important; }
+  .db-bell { width: 34px !important; height: 34px !important; }
+  .db-chip { font-size: var(--gn-fs-cap) !important; }
+  .db-tag, .db-st { font-size: var(--gn-fs-cap) !important; padding: 1px 8px !important; }
+  .db-empty { font-size: var(--gn-fs-sub) !important; }
+  .db-empty .cta { padding: 5px var(--gn-s3) !important; }
+  .gn-remind-txt b, .pay-formula-bar-txt b { font-size: var(--gn-fs-body) !important; letter-spacing: 0 !important; }
+  .gn-remind-btn, .pay-formula-bar-btn {
+    font-size: var(--gn-fs-sub) !important;
+    padding: 6px var(--gn-s4) !important;
+  }
+}
+
+/* ---------- 12c 写在 JS 模板里的行内颜色 ---------- */
+/* app.js 里有一批 style="color:#xxx" 是拼在字符串里的，不改 JS，只能用属性选择器接住。
+   :not([style*="-color:…"]) 是为了不把 border-left-color / background-color 误认成文字色。 */
+[style*="color:#BA7517" i]:not([style*="-color:#BA7517" i]),
+[style*="color:#b45309" i]:not([style*="-color:#b45309" i]),
+[style*="color:#92400e" i]:not([style*="-color:#92400e" i]),
+[style*="color:#d97706" i]:not([style*="-color:#d97706" i]),
+[style*="color:#A32D2D" i]:not([style*="-color:#A32D2D" i]),
+[style*="color:#b91c1c" i]:not([style*="-color:#b91c1c" i]),
+[style*="color:#dc2626" i]:not([style*="-color:#dc2626" i]) {
+  color: var(--gn-red) !important;
+}
+[style*="color:#1D9E75" i]:not([style*="-color:#1D9E75" i]),
+[style*="color:#16a34a" i]:not([style*="-color:#16a34a" i]),
+[style*="color:#0F6E56" i]:not([style*="-color:#0F6E56" i]),
+[style*="color:#639922" i]:not([style*="-color:#639922" i]) {
+  color: var(--gn-st-done-fg) !important;
+}
+[style*="color:#185FA5" i]:not([style*="-color:#185FA5" i]),
+[style*="color:#378ADD" i]:not([style*="-color:#378ADD" i]),
+[style*="color:#2563eb" i]:not([style*="-color:#2563eb" i]),
+[style*="color:#7F77DD" i]:not([style*="-color:#7F77DD" i]) {
+  color: var(--gn-text) !important;
+}
+.main [style*="background:#fffbeb" i], .main [style*="background:#fffaf2" i], .main [style*="background:#faeeda" i],
+.modal [style*="background:#fffbeb" i], .modal [style*="background:#fffaf2" i] {
+  background: var(--gn-surface) !important;
+  border-color: var(--gn-line-strong) !important;
+}
+.main [style*="border-left-color:#"] { border-left-color: var(--gn-line) !important; }
+
+/* 经营仪表盘的漏斗 / 走势 / 转化环：颜色写在 app.js 的常量里（DASH_M、RATIO_META），按色值接住。
+   口径：过程量用灰阶由浅到深，在途 = 蓝，成交 = 绿，只有「放弃 / 流失」用品牌红。 */
+.fn-bar[style*="#e23c3c" i] { background: #c9cdd4 !important; color: var(--gn-text) !important; }
+.fn-bar[style*="#f06a5a" i] { background: #86909c !important; color: #fff !important; }
+.fn-bar[style*="#c41e2a" i] { background: #4e5969 !important; color: #fff !important; }
+.fn-bar[style*="#9ca3af" i] { background: #9fc3ee !important; color: var(--gn-text) !important; }
+.fn-bar[style*="#16a34a" i] { background: var(--gn-st-done-fg) !important; color: #fff !important; }
+.fn-bar[style*="#b91c1c" i] { background: var(--gn-red) !important; color: #fff !important; }
+.main [style*="background:#e23c3c" i]:not(.fn-bar) { background: #c9cdd4 !important; }
+.main [style*="background:#f06a5a" i]:not(.fn-bar) { background: #86909c !important; }
+.main [style*="background:#c41e2a" i]:not(.fn-bar) { background: #4e5969 !important; }
+.main [style*="background:#16a34a" i]:not(.fn-bar) { background: var(--gn-st-done-fg) !important; }
+.main [style*="background:#b91c1c" i]:not(.fn-bar) { background: var(--gn-red) !important; }
+.main svg [stroke="#e23c3c" i] { stroke: #c9cdd4 !important; }
+.main svg [stroke="#f06a5a" i] { stroke: #86909c !important; }
+.main svg [stroke="#c41e2a" i], .main svg [stroke="#378ADD" i], .main svg [stroke="#185FA5" i],
+.main svg [stroke="#7F77DD" i], .main svg [stroke="#BA7517" i] { stroke: #4e5969 !important; }
+.main svg [stroke="#16a34a" i], .main svg [stroke="#639922" i], .main svg [stroke="#1D9E75" i] { stroke: var(--gn-st-done-fg) !important; }
+.main svg [stroke="#b91c1c" i], .main svg [stroke="#E24B4A" i] { stroke: var(--gn-red) !important; }
+.main svg [fill="#e23c3c" i] { fill: #c9cdd4 !important; }
+.main svg [fill="#f06a5a" i] { fill: #86909c !important; }
+.main svg [fill="#c41e2a" i], .main svg [fill="#378ADD" i], .main svg [fill="#185FA5" i],
+.main svg [fill="#7F77DD" i], .main svg [fill="#BA7517" i] { fill: #4e5969 !important; }
+.main svg [fill="#16a34a" i], .main svg [fill="#639922" i], .main svg [fill="#1D9E75" i] { fill: var(--gn-st-done-fg) !important; }
+.main svg [fill="#b91c1c" i], .main svg [fill="#E24B4A" i] { fill: var(--gn-red) !important; }
+.ratio-card[style*="#0891b2" i], .ratio-card[style*="#2563eb" i] { --rc: #4e5969 !important; }
+.ratio-card[style*="#16a34a" i] { --rc: var(--gn-st-done-fg) !important; }
+.ratio-card[style*="#dc2626" i] { --rc: var(--gn-red) !important; }
+.main svg [stroke="#0891b2" i], .main svg [stroke="#2563eb" i] { stroke: #4e5969 !important; }
+.main svg [stroke="#dc2626" i] { stroke: var(--gn-red) !important; }
+.fn-barwrap, .fn-barwrap .fn-bar { border-radius: var(--gn-r-tag) !important; }
+
+/* ---------- 13 AI 预留区 ---------- */
+/* 每页同一个位置（内容区最上方）一条细栏：默认收起只占一行，不抢主内容。
+   只有容器和占位文案；将来 AI 模块把结果写进三个 [data-ai-slot] 即可。 */
+.gn-ai {
+  margin: 0 0 var(--gn-s4);
+  border: 1px solid var(--gn-line);
+  border-radius: var(--gn-r-card);
+  background: var(--gn-bg);
+  color: var(--gn-text-2);
+  font-size: var(--gn-fs-sub);
+}
+.gn-ai-hd {
+  display: flex;
+  align-items: center;
+  gap: var(--gn-s2);
+  min-height: 36px;
+  padding: 0 var(--gn-s4);
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+.gn-ai-hd::-webkit-details-marker { display: none; }
+.gn-ai-hd::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  margin-left: var(--gn-s2);
+  border-right: 1.5px solid var(--gn-text-3);
+  border-bottom: 1.5px solid var(--gn-text-3);
+  transform: rotate(45deg) translateY(-2px);
+  flex: none;
+}
+.gn-ai[open] > .gn-ai-hd::after { transform: rotate(-135deg) translateY(-2px); }
+.gn-ai-hd:hover { background: var(--gn-surface); border-radius: var(--gn-r-card); }
+.gn-ai-hd:focus-visible { outline: 2px solid var(--gn-red-line); outline-offset: -2px; }
+.gn-ai-badge {
+  flex: none;
+  padding: 0 6px;
+  border: 1px solid var(--gn-line-strong);
+  border-radius: var(--gn-r-tag);
+  font-size: 11px;
+  line-height: 18px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  color: var(--gn-text-2);
+}
+.gn-ai-title { flex: none; font-weight: 600; color: var(--gn-text); }
+.gn-ai-sub { flex: 1 1 auto; min-width: 0; color: var(--gn-text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gn-ai-state { flex: none; color: var(--gn-text-3); font-size: var(--gn-fs-cap); }
+.gn-ai-bd {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--gn-s3);
+  padding: var(--gn-s3) var(--gn-s4) var(--gn-s4);
+  border-top: 1px solid var(--gn-line-soft);
+}
+.gn-ai-cell {
+  min-height: 72px;
+  padding: var(--gn-s3);
+  border: 1px dashed var(--gn-line);
+  border-radius: var(--gn-r-ctl);
+  background: var(--gn-surface);
+}
+.gn-ai-cell h4 { margin: 0 0 var(--gn-s1); font-size: var(--gn-fs-sub); line-height: 20px; font-weight: 600; color: var(--gn-text); }
+.gn-ai-ph { margin: 0; font-size: var(--gn-fs-cap); line-height: 18px; color: var(--gn-text-3); }
+/* 模块接入后给容器加 data-ai-ready，占位样式自动让位给真实内容 */
+.gn-ai-cell[data-ai-ready] { border-style: solid; background: var(--gn-bg); }
+.gn-ai-cell[data-ai-ready] .gn-ai-ph { display: none; }
+
+/* ---------- 14 登录页 ---------- */
+.auth-wrap { background: var(--gn-bg) !important; }
+.auth-card {
+  border: 1px solid var(--gn-line);
+  border-radius: var(--gn-r-card) !important;
+  box-shadow: 0 8px 24px rgba(31, 35, 41, .06) !important;
+}
+.brand-sub { color: var(--gn-text-3) !important; }
+
+@media (min-width: 821px) {
+  .auth-form input, .auth-form select { padding: 9px 12px; font-size: var(--gn-fs-body); }
+  .auth-form .btn.primary { padding: 10px var(--gn-s4); }
+}
+
+/* ---------- 15 响应式 ---------- */
+/* 三档：
+     ≥1101px  电脑：上面各节 @media (min-width: 821px) 里的尺寸、间距全部生效；
+     821–1100 平板 / 小屏笔记本：同一套，只把内容区和卡片的留白收一档；
+     ≤820px   手机：版式沿用 style.css 里原来逐屏量过的那套（导航横滑、筛选栏压成多列、
+              ≤640px 表格变成「一行一张卡」），这里只换颜色、圆角、边框，不改任何尺寸。 */
+.table-wrap { max-width: 100%; }
+@media (min-width: 821px) and (max-width: 1100px) {
+  .content { padding: var(--gn-s4) var(--gn-s4) 40px !important; }
+  .card { padding: var(--gn-s4); }
+  .db-home-card { padding: var(--gn-s3) var(--gn-s4) !important; }
+}
+@media (max-width: 820px) {
+  /* 手机端导航是一排横滑的页签：当前页用底部一道红线标出来 */
+  .sidebar { border-right: 0 !important; border-bottom: 1px solid var(--gn-line) !important; }
+  .sidebar .nav-btn { border-radius: 0 !important; }
+  /* 导航已经有红色下划线了，紧挨着的顶栏红线在手机上就不再重复画一道 */
+  .topbar::before { display: none !important; }
+  .sidebar .nav-btn.active {
+    background: var(--gn-bg) !important;
+    box-shadow: inset 0 -2px 0 var(--gn-red) !important;
+  }
+  .gn-ai { margin-bottom: var(--gn-s3); }
+  .gn-ai-hd { padding: 0 var(--gn-s3); }
+  .gn-ai-bd { grid-template-columns: 1fr; padding: var(--gn-s3); }
+  .gn-ai-sub { display: none; }
+  .gn-ai-state { margin-left: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+/* ---------- 16 打印 ---------- */
+/* 报销「正式单据」是要打印留档的，保持它原来的黑白表格，不套后台的表头样式 */
+.pp-table th {
+  background: #f1f5f9 !important;
+  color: #1f2329 !important;
+  border: 1px solid #cbd5e1 !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+}
+.pp-table td { border-color: #cbd5e1; color: #1f2329; }
+@media print {
+  .gn-ai { display: none !important; }
+}

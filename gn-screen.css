@@ -1,0 +1,261 @@
+/* =====================================================================
+   gn-screen.css —— dash.html / shuju.html（业务中控投屏页）换成白底品牌版
+   ---------------------------------------------------------------------
+   · 只换皮：原页面的布局、取数、轮询、图表逻辑一行不动。
+   · 加载顺序：排在页面内联 <style> 之后（apply_theme.py 会插在 </head> 前）。
+   · 配色口径跟 gn-theme.css 同一套：白底、品牌红只标重点，其余走灰阶 + 浅蓝 / 浅绿。
+   · JS 里画图用的颜色不走 CSS，由 apply_theme.py 改 CONFIG.colors 那 9 个值，两边必须一致。
+   ===================================================================== */
+
+/* ---------- 1 变量：把原来的霓虹色接到品牌色板上 ---------- */
+:root {
+  --bg: #ffffff;
+  --bg-2: #ffffff;
+  --panel: #ffffff;
+  --card: #ffffff;
+  --line: #e5e6eb;
+  --line-2: #c9cdd4;
+  --text: #1f2329;
+  --muted: #4e5969;
+  --dim: #86909c;
+  --cyan: #1f2329;      /* 原主强调色（青）→ 墨色 */
+  --purple: #1d5fb8;    /* 紫 → 蓝（正常跟进） */
+  --orange: #4e5969;    /* 橙 → 深灰 */
+  --magenta: #e00012;   /* 洋红 → 品牌红 */
+  --green: #1a7f45;     /* 绿（已成交） */
+  --red: #e00012;       /* 红 → 品牌红 */
+  --yellow: #86909c;    /* 黄 → 灰 */
+  --blue: #5b8fd6;
+  --shadow: none;
+  --display: var(--font);
+
+  --gn-red: #e00012;
+  --gn-red-soft: #fff1f2;
+  --gn-red-line: #f7c6ca;
+  --gn-surface: #f7f8fa;
+}
+
+/* ---------- 2 去特效：发光、扫光、呼吸、底纹、流动粒子全部撤掉 ---------- */
+*, *::before, *::after {
+  text-shadow: none !important;
+  box-shadow: none !important;
+  animation: none !important;
+}
+html, body { background: #ffffff !important; color: var(--text); }
+body::before { display: none !important; }
+svg *, .card, .fn-step, .fn-inbox { filter: none !important; }
+header, .panel, .kpi { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+.panel::before, .kpi::after, .fn-step::before, .fn-step::after, .fn-inbox::before, .fn-inbox::after,
+.rb-bar i::after { display: none !important; }
+.fn-drop { display: none !important; }
+/* 连线上跑的粒子是 SMIL 动画，CSS 停不了，直接不显示；线和节点照常画 */
+svg g:has(> animateMotion), svg circle:has(> animateMotion) { display: none !important; }
+.log-list { -webkit-mask-image: none !important; mask-image: none !important; }
+
+/* ---------- 3 外壳 ---------- */
+header {
+  background: #ffffff !important;
+  border-bottom: 1px solid var(--line) !important;
+}
+footer { background: #ffffff !important; border-top: 1px solid var(--line) !important; color: var(--dim) !important; }
+.brand-mark {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: url("logo-mark.png") center / contain no-repeat !important;
+}
+.brand-mark::before, .brand-mark::after { display: none !important; }
+.brand h1 { color: var(--text) !important; }
+.brand h1 span { color: var(--text) !important; }
+.brand p { color: var(--dim) !important; }
+
+.kpi { background: #ffffff !important; border: 1px solid var(--line) !important; border-radius: 6px !important; }
+.kpi b { color: var(--text) !important; }
+.kpi span { color: var(--dim) !important; }
+
+.tog { border-color: var(--line-2) !important; border-radius: 6px !important; }
+.tog button { background: #ffffff !important; color: var(--muted) !important; }
+.tog button.on { background: var(--gn-red-soft) !important; color: var(--gn-red) !important; font-weight: 600; }
+.tog button[data-mode="live"].on { background: var(--gn-red) !important; color: #ffffff !important; }
+.ico-btn { background: #ffffff !important; border-color: var(--line-2) !important; color: var(--muted) !important; border-radius: 6px !important; }
+.ico-btn:hover { border-color: var(--dim) !important; color: var(--text) !important; }
+
+/* ---------- 4 面板 ---------- */
+.panel {
+  background: #ffffff !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 8px !important;
+}
+.ph { border-bottom: 1px solid var(--line) !important; }
+.ph h2 { color: var(--text) !important; }
+.ph h2 i { background: var(--dim) !important; border-radius: 1px; }
+.ph .sub { color: var(--dim) !important; }
+.panel-tabs button, .mod-tabs button {
+  background: #ffffff !important;
+  border-color: var(--line) !important;
+  color: var(--muted) !important;
+  border-radius: 4px !important;
+}
+.panel-tabs button:hover, .mod-tabs button:hover { border-color: var(--line-2) !important; color: var(--text) !important; }
+.panel-tabs button.on, .mod-tabs button.on {
+  background: var(--gn-red-soft) !important;
+  border-color: var(--gn-red-line) !important;
+  color: var(--gn-red) !important;
+}
+
+/* ---------- 5 左栏：链路 / 排行 / 漏斗 ---------- */
+.mod { background: #ffffff !important; border-color: var(--line) !important; border-radius: 6px !important; }
+.mod .c { color: var(--text) !important; }
+.sw { background: var(--gn-surface) !important; border-color: var(--line-2) !important; }
+.sw i { background: var(--dim) !important; }
+.sw.on { background: var(--text) !important; border-color: var(--text) !important; }
+.sw.on i { background: #ffffff !important; }
+
+.rb-head { color: var(--dim) !important; }
+.rb-head b { color: var(--text) !important; }
+.rb-tag { background: var(--gn-surface) !important; color: var(--muted) !important; border: 1px solid var(--line); border-radius: 4px !important; }
+.rb-row.hot { background: var(--gn-surface) !important; }
+.rb-no { background: var(--gn-surface) !important; color: var(--muted) !important; }
+/* 前三名：第一名品牌红，二三名深浅灰 —— 不再用金银铜渐变 */
+.rb-row.m1 .rb-no { background: var(--gn-red) !important; color: #ffffff !important; }
+.rb-row.m2 .rb-no { background: var(--muted) !important; color: #ffffff !important; }
+.rb-row.m3 .rb-no { background: var(--dim) !important; color: #ffffff !important; }
+.rb-name { color: var(--text) !important; }
+.rb-team { color: var(--dim) !important; }
+.rb-val, .rb-row.m1 .rb-val { color: var(--text) !important; }
+.rb-dlt.up { color: var(--green) !important; background: #e8f7ee !important; }
+.rb-dlt.dn { color: var(--gn-red) !important; background: var(--gn-red-soft) !important; }
+.rb-dlt.new { color: var(--muted) !important; background: var(--gn-surface) !important; }
+.rb-bar { background: #f0f1f3 !important; }
+.rb-bar i { background: var(--muted) !important; }
+.rb-row.m1 .rb-bar i { background: var(--gn-red) !important; }
+.rb-foot { color: var(--dim) !important; }
+
+/* 漏斗：浅色条 + 深色字，颜色只表达「过程 / 成交」两种含义 */
+.fn-step { border: 1px solid var(--line) !important; border-radius: 6px !important; }
+.fn-step span, .fn-step b, .fn-inbox span, .fn-inbox b { color: var(--text) !important; }
+.fn-step.gold { background: var(--gn-surface) !important; }
+.fn-step.magenta { background: #e8f3ff !important; border-color: #c4dffb !important; }
+.fn-step.blue { background: #f2f3f5 !important; }
+.fn-step.green { background: #e8f7ee !important; border-color: #bfe6cd !important; }
+.fn-inbox { background: #ffffff !important; border: 1px solid var(--line-2) !important; border-radius: 6px !important; color: var(--text) !important; }
+.fn-rates div { color: var(--dim) !important; }
+.fn-rates b { color: var(--text) !important; }
+.fn-rates b.up { color: var(--green) !important; }
+.sim-badge { background: var(--gn-surface) !important; color: var(--muted) !important; border: 1px solid var(--line); }
+
+/* ---------- 6 中栏：链路图 / 战榜 / 门店卡 ---------- */
+.net-legend { background: #ffffff !important; color: var(--dim) !important; border: 1px solid var(--line); }
+.net-legend .lg-dim { color: var(--line-2) !important; }
+.rank-head { color: var(--dim) !important; }
+.rank-row { background: #ffffff !important; border-color: var(--line) !important; border-radius: 6px !important; }
+.rank-row.top { background: var(--gn-surface) !important; border-color: var(--line-2) !important; }
+.rank-row.top .rank-no { color: var(--gn-red) !important; }
+.rank-v b, .rank-v.hire b, .rank-v.entry b, .rank-v.rp b, .rank-v.arr b { color: var(--text) !important; }
+.rbar { background: #f0f1f3 !important; }
+.rbar b { background: var(--muted) !important; opacity: 1 !important; }
+
+.card {
+  background: #ffffff !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 8px !important;
+}
+.card::before { background: var(--accent) !important; }
+.card.run { --accent: var(--line-2); }
+.card-hd h3 { color: var(--text); }
+.tag { border-radius: 4px !important; }
+.tag.pass { color: var(--green) !important; border-color: #bfe6cd !important; background: #e8f7ee !important; }
+.tag.run { color: #1d5fb8 !important; border-color: #c4dffb !important; background: #e8f3ff !important; }
+.tag.reject { color: #ffffff !important; border-color: var(--gn-red) !important; background: var(--gn-red) !important; }
+.metrics .fail b { color: var(--gn-red) !important; }
+
+/* ---------- 7 右栏：流水 / 仪表 / 日志 ---------- */
+.pipe-row::before { background: var(--line) !important; opacity: 1 !important; }
+.ps i { border-color: #ffffff !important; }
+.gauge-val { fill: var(--text) !important; }
+.gauge-unit, .gauge-lbl { fill: var(--dim) !important; }
+#heart { border-top-color: var(--line) !important; }
+.log-list, .log-sum { color: var(--muted) !important; }
+.log-sum { background: #ffffff !important; border-top-color: var(--line) !important; }
+.log-list .logsum { color: var(--text) !important; border-top-color: var(--line) !important; }
+.log-list div.fresh { background: transparent !important; }
+#toast { background: #ffffff !important; border-color: var(--line-2) !important; color: var(--text) !important; }
+
+/* ---------- 8 JS 里写死的几处颜色 ---------- */
+/* 画图代码里有少量不走 CONFIG 的十六进制色（白心、深色描边等），用属性选择器接住 */
+svg [fill="#0a0e17" i], svg [fill="#0b111d" i], svg [fill="#10182a" i], svg [fill="#0c121e" i] { fill: #ffffff !important; }
+svg [stroke^="rgba(30,40,58"] { stroke: #e5e6eb !important; }
+svg [stroke="#0a0e17" i], svg [stroke="#0b111d" i] { stroke: #ffffff !important; }
+svg [fill="#dbe6f4" i], svg [fill="#d8e2f0" i], svg [fill="#c9d6e8" i], svg [fill="#f0f6ff" i], svg [fill="#eef4ff" i],
+svg [fill="#ffffff" i][font-size], svg text[fill="#ffffff" i] { fill: #1f2329 !important; }
+svg [fill="#9aabbe" i], svg [fill="#7d8ca3" i], svg [fill="#7b8ea6" i], svg [fill="#6a7a90" i] { fill: #86909c !important; }
+svg [stroke="#9aabbe" i], svg [stroke="#7d8ca3" i], svg [stroke="#7b8ea6" i], svg [stroke="#6a7a90" i] { stroke: #c9cdd4 !important; }
+
+/* ---------- 9 AI 预留区 ---------- */
+/* 投屏页是锁死一屏的网格，不能像主系统那样在内容区顶上插一行；
+   这里把整屏让出底部 36px，放同一个预留条（标记和主系统是同一段 gn-ai-slot.html）。
+   展开时向上浮出，不挤压图表。 */
+#app { height: calc(100vh - 36px) !important; }
+.gn-ai {
+  position: fixed;
+  left: 10px;
+  right: 10px;
+  bottom: 4px;
+  z-index: 30;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--muted);
+  font-size: 12px;
+}
+.gn-ai-hd {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 26px;
+  padding: 0 12px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+.gn-ai-hd::-webkit-details-marker { display: none; }
+.gn-ai-hd::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  margin-left: 6px;
+  border-right: 1.5px solid var(--dim);
+  border-bottom: 1.5px solid var(--dim);
+  transform: rotate(-135deg) translateY(-2px);
+  flex: none;
+}
+.gn-ai[open] > .gn-ai-hd::after { transform: rotate(45deg) translateY(-2px); }
+.gn-ai-badge {
+  flex: none;
+  padding: 0 6px;
+  border: 1px solid var(--line-2);
+  border-radius: 4px;
+  font-size: 10px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  color: var(--muted);
+}
+.gn-ai-title { flex: none; font-weight: 600; color: var(--text); }
+.gn-ai-sub { flex: 1 1 auto; min-width: 0; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gn-ai-state { flex: none; color: var(--dim); font-size: 11px; }
+.gn-ai-bd {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  padding: 10px 12px 12px;
+  border-top: 1px solid var(--line);
+}
+.gn-ai-cell { min-height: 64px; padding: 10px; border: 1px dashed var(--line); border-radius: 6px; background: var(--gn-surface); }
+.gn-ai-cell h4 { margin: 0 0 4px; font-size: 12px; line-height: 18px; font-weight: 600; color: var(--text); }
+.gn-ai-ph { margin: 0; font-size: 11px; line-height: 16px; color: var(--dim); }
+.gn-ai-cell[data-ai-ready] { border-style: solid; background: #ffffff; }
+.gn-ai-cell[data-ai-ready] .gn-ai-ph { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
