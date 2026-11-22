@@ -372,7 +372,7 @@ mark { background: var(--gn-red-soft) !important; color: var(--gn-red-hover); }
 .btn.blue, #view-jobs .btn.blue,
 #view-jobs .btn:not(.primary):not(.danger):not(.on),
 #view-jobs .btn.ghost:not(.danger):not(.on),
-.btn.tiny.lhi-alive, .btn.ghost.ld-intent-btn {
+.btn.tiny.lhi-alive:not(.on), .btn.ghost.ld-intent-btn:not(.on) {
   background: var(--gn-bg) !important;
   border: 1px solid var(--gn-line-strong) !important;
   color: var(--gn-text) !important;
@@ -382,7 +382,7 @@ mark { background: var(--gn-red-soft) !important; color: var(--gn-red-hover); }
 .btn.ghost:not(.danger):not(.on):hover,
 .btn.blue:hover:not(:disabled), #view-jobs .btn.blue:hover:not(:disabled),
 #view-jobs .btn:not(.primary):not(.danger):not(.on):hover:not(:disabled),
-.btn.tiny.lhi-alive:hover, .btn.ghost.ld-intent-btn:hover {
+.btn.tiny.lhi-alive:not(.on):hover, .btn.ghost.ld-intent-btn:not(.on):hover {
   background: var(--gn-surface) !important;
   border-color: var(--gn-text-3) !important;
   color: var(--gn-text) !important;
