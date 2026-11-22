@@ -9,7 +9,8 @@
   1. 把 gn-theme.css / gn-screen.css 复制进部署目录；
   2. index.html：在 </head> 前加一行 <link>（排在内联 <style> 之后才压得住）；
   3. index.html：在 <div class="content"> 里最前面插入 AI 预留区（gn-ai-slot.html）；
-  4. dash.html / shuju.html：加一行 <link>，并把 CONFIG.colors 那 9 个配色值换成品牌色板
+  4. dash.html / shuju.html：加一行 <link>、在 <div id="app"></div> 后面插入同一段 AI 预留区，
+     并把 CONFIG.colors 那 9 个配色值换成品牌色板
      （那段注释写明「配色均在下方 CONFIG 中修改」，只换颜色值，不碰任何取数逻辑）。
 
 不会改 app.js、api.php、任何 .php，也不改 style.css。
@@ -22,17 +23,17 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 MARK = "gn-theme"
 
-# 大屏配色：原霓虹色 → 品牌色板（红 = 重点指标，其余走灰阶 + 浅蓝 / 浅绿两个辅助色）
+# 大屏配色：原霓虹色 → 品牌色板。必须跟 gn-screen.css 开头那组变量逐个对应。
 SCREEN_COLORS = {
     "bg": "#ffffff",
     "cyan": "#1f2329",
-    "purple": "#5b8fd6",
-    "orange": "#86909c",
+    "purple": "#1d5fb8",
+    "orange": "#4e5969",
     "magenta": "#e00012",
-    "green": "#2f9e6b",
+    "green": "#1a7f45",
     "red": "#e00012",
-    "yellow": "#4e5969",
-    "blue": "#9fc3ee",
+    "yellow": "#86909c",
+    "blue": "#5b8fd6",
 }
 
 
@@ -72,10 +73,9 @@ def add_link(text, nl, css, ver):
     return text.replace("</head>", block(link, nl) + "</head>", 1)
 
 
-def add_ai_slot(text, nl):
-    anchor = '<div class="content">'
+def add_ai_slot(text, nl, anchor='<div class="content">'):
     if anchor not in text:
-        raise SystemExit('index.html 里找不到 <div class="content">，AI 预留区没插进去')
+        raise SystemExit('找不到 %s，AI 预留区没插进去' % anchor)
     with open(os.path.join(HERE, "gn-ai-slot.html"), encoding="utf-8") as f:
         slot = f.read().replace("\r\n", "\n").rstrip("\n").replace("\n", nl)
     at = text.index(anchor) + len(anchor)
@@ -136,6 +136,7 @@ def main():
         text = strip_marked(text)
         if not revert:
             text = add_link(text, nl, "gn-screen.css", ver)
+            text = add_ai_slot(text, nl, '<div id="app"></div>')
             text = recolor_screen(text)
         write(path, text)
         print(("已撤掉：" if revert else "已挂上：") + name)
