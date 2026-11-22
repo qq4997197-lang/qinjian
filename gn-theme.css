@@ -4,6 +4,10 @@
    · 只改长相：不动 app.js / api.php / 任何接口、字段、流程。
    · 加载顺序：必须排在 style.css 和 index.html 内联 <style> 之后。
    · 回滚：删掉 <link href="gn-theme.css"> 这一行即可，style.css 一个字节没改。
+   · 每一节分两段：前半是颜色 / 圆角 / 边框（所有屏宽都生效），
+     后半 @media (min-width: 821px) 是尺寸 / 间距 / 字号（只在电脑端生效）。
+     手机端的版式是之前逐屏量过的，这里一个尺寸都不碰，只换皮。
+   · 以后新加组件请直接用第 1 节的 --gn-* 变量，别再写死色值和圆角。
    · 文件结构：
        1 设计变量（1b 字号/圆角归一）  2 基础排版  3 外壳（侧栏 / 顶栏 / 内容区）
        4 卡片          5 按钮         6 页签 / 分页
@@ -837,6 +841,7 @@ input:not([type]), select, textarea) {
 .saf-edit-table td.saf-td.editable:hover { box-shadow: inset 0 0 0 1px var(--gn-line-strong) !important; }
 .stat-card.lhi-ask-card:focus-visible { outline-color: var(--gn-red-line) !important; }
 .exp-thumb-doc, .ld-b-chip i { color: var(--gn-text-3) !important; }
+.exp-up-btn { border-color: var(--gn-line-strong) !important; }
 .ld-proxy { color: var(--gn-red) !important; }
 .as-pname { text-decoration-color: var(--gn-line-strong) !important; }
 .saf-inp { border-color: var(--gn-red) !important; }
@@ -1176,6 +1181,38 @@ input:not([type]), select, textarea) {
 }
 .main [style*="border-left-color:#"] { border-left-color: var(--gn-line) !important; }
 
+/* 经营仪表盘的漏斗 / 走势 / 转化环：颜色写在 app.js 的常量里（DASH_M、RATIO_META），按色值接住。
+   口径：过程量用灰阶由浅到深，在途 = 蓝，成交 = 绿，只有「放弃 / 流失」用品牌红。 */
+.fn-bar[style*="#e23c3c" i] { background: #c9cdd4 !important; color: var(--gn-text) !important; }
+.fn-bar[style*="#f06a5a" i] { background: #86909c !important; color: #fff !important; }
+.fn-bar[style*="#c41e2a" i] { background: #4e5969 !important; color: #fff !important; }
+.fn-bar[style*="#9ca3af" i] { background: #9fc3ee !important; color: var(--gn-text) !important; }
+.fn-bar[style*="#16a34a" i] { background: var(--gn-st-done-fg) !important; color: #fff !important; }
+.fn-bar[style*="#b91c1c" i] { background: var(--gn-red) !important; color: #fff !important; }
+.main [style*="background:#e23c3c" i]:not(.fn-bar) { background: #c9cdd4 !important; }
+.main [style*="background:#f06a5a" i]:not(.fn-bar) { background: #86909c !important; }
+.main [style*="background:#c41e2a" i]:not(.fn-bar) { background: #4e5969 !important; }
+.main [style*="background:#16a34a" i]:not(.fn-bar) { background: var(--gn-st-done-fg) !important; }
+.main [style*="background:#b91c1c" i]:not(.fn-bar) { background: var(--gn-red) !important; }
+.main svg [stroke="#e23c3c" i] { stroke: #c9cdd4 !important; }
+.main svg [stroke="#f06a5a" i] { stroke: #86909c !important; }
+.main svg [stroke="#c41e2a" i], .main svg [stroke="#378ADD" i], .main svg [stroke="#185FA5" i],
+.main svg [stroke="#7F77DD" i], .main svg [stroke="#BA7517" i] { stroke: #4e5969 !important; }
+.main svg [stroke="#16a34a" i], .main svg [stroke="#639922" i], .main svg [stroke="#1D9E75" i] { stroke: var(--gn-st-done-fg) !important; }
+.main svg [stroke="#b91c1c" i], .main svg [stroke="#E24B4A" i] { stroke: var(--gn-red) !important; }
+.main svg [fill="#e23c3c" i] { fill: #c9cdd4 !important; }
+.main svg [fill="#f06a5a" i] { fill: #86909c !important; }
+.main svg [fill="#c41e2a" i], .main svg [fill="#378ADD" i], .main svg [fill="#185FA5" i],
+.main svg [fill="#7F77DD" i], .main svg [fill="#BA7517" i] { fill: #4e5969 !important; }
+.main svg [fill="#16a34a" i], .main svg [fill="#639922" i], .main svg [fill="#1D9E75" i] { fill: var(--gn-st-done-fg) !important; }
+.main svg [fill="#b91c1c" i], .main svg [fill="#E24B4A" i] { fill: var(--gn-red) !important; }
+.ratio-card[style*="#0891b2" i], .ratio-card[style*="#2563eb" i] { --rc: #4e5969 !important; }
+.ratio-card[style*="#16a34a" i] { --rc: var(--gn-st-done-fg) !important; }
+.ratio-card[style*="#dc2626" i] { --rc: var(--gn-red) !important; }
+.main svg [stroke="#0891b2" i], .main svg [stroke="#2563eb" i] { stroke: #4e5969 !important; }
+.main svg [stroke="#dc2626" i] { stroke: var(--gn-red) !important; }
+.fn-barwrap, .fn-barwrap .fn-bar { border-radius: var(--gn-r-tag) !important; }
+
 /* ---------- 13 AI 预留区 ---------- */
 /* 每页同一个位置（内容区最上方）一条细栏：默认收起只占一行，不抢主内容。
    只有容器和占位文案；将来 AI 模块把结果写进三个 [data-ai-slot] 即可。 */
@@ -1292,6 +1329,15 @@ input:not([type]), select, textarea) {
 }
 
 /* ---------- 16 打印 ---------- */
+/* 报销「正式单据」是要打印留档的，保持它原来的黑白表格，不套后台的表头样式 */
+.pp-table th {
+  background: #f1f5f9 !important;
+  color: #1f2329 !important;
+  border: 1px solid #cbd5e1 !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+}
+.pp-table td { border-color: #cbd5e1; color: #1f2329; }
 @media print {
   .gn-ai { display: none !important; }
 }
